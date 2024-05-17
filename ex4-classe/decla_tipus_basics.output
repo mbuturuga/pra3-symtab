@@ -1,0 +1,481 @@
+Gramática
+
+    0 $accept: programa $end
+
+    1 programa: ε
+    2         | llistainst
+
+    3 llistainst: inst
+    4           | llistainst inst
+
+    5 inst: ';'
+    6     | decla ';'
+    7     | asig ';'
+    8     | error ';'
+
+    9 decla: tipus llistaid
+
+   10 tipus: INT
+   11      | REAL
+   12      | CHAR
+
+   13 llistaid: ID
+   14         | llistaid ',' ID
+
+   15 asig: ID '=' aux expr
+
+   16 aux: ε
+
+   17 expr: expr '+' expr
+   18     | expr '-' expr
+   19     | expr '*' expr
+   20     | expr '/' expr
+   21     | '(' expr ')'
+   22     | ID
+   23     | VINT
+   24     | VREAL
+   25     | VCHAR
+
+
+Terminales con las reglas donde aparecen
+
+    $end (0) 0
+    '(' (40) 21
+    ')' (41) 21
+    '*' (42) 19
+    '+' (43) 17
+    ',' (44) 14
+    '-' (45) 18
+    '/' (47) 20
+    ';' (59) 5 6 7 8
+    '=' (61) 15
+    error (256) 8
+    ID <name> (258) 13 14 15 22
+    VINT <enter> (259) 23
+    VREAL <real> (260) 24
+    VCHAR <caracter> (261) 25
+    INT (262) 10
+    REAL (263) 11
+    CHAR (264) 12
+
+
+No terminales con las reglas donde aparecen
+
+    $accept (19)
+        on left: 0
+    programa <sense_atribut> (20)
+        on left: 1 2
+        on right: 0
+    llistainst <sense_atribut> (21)
+        on left: 3 4
+        on right: 2 4
+    inst <sense_atribut> (22)
+        on left: 5 6 7 8
+        on right: 3 4
+    decla <sense_atribut> (23)
+        on left: 9
+        on right: 6
+    tipus <tipus_b> (24)
+        on left: 10 11 12
+        on right: 9
+    llistaid <tipus_b> (25)
+        on left: 13 14
+        on right: 9 14
+    asig <sense_atribut> (26)
+        on left: 15
+        on right: 7
+    aux <tipus_b> (27)
+        on left: 16
+        on right: 15
+    expr <tipus_b> (28)
+        on left: 17 18 19 20 21 22 23 24 25
+        on right: 15 17 18 19 20 21
+
+
+Estado 0
+
+    0 $accept: • programa $end
+
+    error  desplazar e ir al estado 1
+    ID     desplazar e ir al estado 2
+    INT    desplazar e ir al estado 3
+    REAL   desplazar e ir al estado 4
+    CHAR   desplazar e ir al estado 5
+    ';'    desplazar e ir al estado 6
+
+    $end  reduce usando la regla 1 (programa)
+
+    programa    ir al estado 7
+    llistainst  ir al estado 8
+    inst        ir al estado 9
+    decla       ir al estado 10
+    tipus       ir al estado 11
+    asig        ir al estado 12
+
+
+Estado 1
+
+    8 inst: error • ';'
+
+    ';'  desplazar e ir al estado 13
+
+
+Estado 2
+
+   15 asig: ID • '=' aux expr
+
+    '='  desplazar e ir al estado 14
+
+
+Estado 3
+
+   10 tipus: INT •
+
+    $default  reduce usando la regla 10 (tipus)
+
+
+Estado 4
+
+   11 tipus: REAL •
+
+    $default  reduce usando la regla 11 (tipus)
+
+
+Estado 5
+
+   12 tipus: CHAR •
+
+    $default  reduce usando la regla 12 (tipus)
+
+
+Estado 6
+
+    5 inst: ';' •
+
+    $default  reduce usando la regla 5 (inst)
+
+
+Estado 7
+
+    0 $accept: programa • $end
+
+    $end  desplazar e ir al estado 15
+
+
+Estado 8
+
+    2 programa: llistainst •
+    4 llistainst: llistainst • inst
+
+    error  desplazar e ir al estado 1
+    ID     desplazar e ir al estado 2
+    INT    desplazar e ir al estado 3
+    REAL   desplazar e ir al estado 4
+    CHAR   desplazar e ir al estado 5
+    ';'    desplazar e ir al estado 6
+
+    $end  reduce usando la regla 2 (programa)
+
+    inst   ir al estado 16
+    decla  ir al estado 10
+    tipus  ir al estado 11
+    asig   ir al estado 12
+
+
+Estado 9
+
+    3 llistainst: inst •
+
+    $default  reduce usando la regla 3 (llistainst)
+
+
+Estado 10
+
+    6 inst: decla • ';'
+
+    ';'  desplazar e ir al estado 17
+
+
+Estado 11
+
+    9 decla: tipus • llistaid
+
+    ID  desplazar e ir al estado 18
+
+    llistaid  ir al estado 19
+
+
+Estado 12
+
+    7 inst: asig • ';'
+
+    ';'  desplazar e ir al estado 20
+
+
+Estado 13
+
+    8 inst: error ';' •
+
+    $default  reduce usando la regla 8 (inst)
+
+
+Estado 14
+
+   15 asig: ID '=' • aux expr
+
+    $default  reduce usando la regla 16 (aux)
+
+    aux  ir al estado 21
+
+
+Estado 15
+
+    0 $accept: programa $end •
+
+    $default  aceptar
+
+
+Estado 16
+
+    4 llistainst: llistainst inst •
+
+    $default  reduce usando la regla 4 (llistainst)
+
+
+Estado 17
+
+    6 inst: decla ';' •
+
+    $default  reduce usando la regla 6 (inst)
+
+
+Estado 18
+
+   13 llistaid: ID •
+
+    $default  reduce usando la regla 13 (llistaid)
+
+
+Estado 19
+
+    9 decla: tipus llistaid •
+   14 llistaid: llistaid • ',' ID
+
+    ','  desplazar e ir al estado 22
+
+    $default  reduce usando la regla 9 (decla)
+
+
+Estado 20
+
+    7 inst: asig ';' •
+
+    $default  reduce usando la regla 7 (inst)
+
+
+Estado 21
+
+   15 asig: ID '=' aux • expr
+
+    ID     desplazar e ir al estado 23
+    VINT   desplazar e ir al estado 24
+    VREAL  desplazar e ir al estado 25
+    VCHAR  desplazar e ir al estado 26
+    '('    desplazar e ir al estado 27
+
+    expr  ir al estado 28
+
+
+Estado 22
+
+   14 llistaid: llistaid ',' • ID
+
+    ID  desplazar e ir al estado 29
+
+
+Estado 23
+
+   22 expr: ID •
+
+    $default  reduce usando la regla 22 (expr)
+
+
+Estado 24
+
+   23 expr: VINT •
+
+    $default  reduce usando la regla 23 (expr)
+
+
+Estado 25
+
+   24 expr: VREAL •
+
+    $default  reduce usando la regla 24 (expr)
+
+
+Estado 26
+
+   25 expr: VCHAR •
+
+    $default  reduce usando la regla 25 (expr)
+
+
+Estado 27
+
+   21 expr: '(' • expr ')'
+
+    ID     desplazar e ir al estado 23
+    VINT   desplazar e ir al estado 24
+    VREAL  desplazar e ir al estado 25
+    VCHAR  desplazar e ir al estado 26
+    '('    desplazar e ir al estado 27
+
+    expr  ir al estado 30
+
+
+Estado 28
+
+   15 asig: ID '=' aux expr •
+   17 expr: expr • '+' expr
+   18     | expr • '-' expr
+   19     | expr • '*' expr
+   20     | expr • '/' expr
+
+    '+'  desplazar e ir al estado 31
+    '-'  desplazar e ir al estado 32
+    '*'  desplazar e ir al estado 33
+    '/'  desplazar e ir al estado 34
+
+    $default  reduce usando la regla 15 (asig)
+
+
+Estado 29
+
+   14 llistaid: llistaid ',' ID •
+
+    $default  reduce usando la regla 14 (llistaid)
+
+
+Estado 30
+
+   17 expr: expr • '+' expr
+   18     | expr • '-' expr
+   19     | expr • '*' expr
+   20     | expr • '/' expr
+   21     | '(' expr • ')'
+
+    '+'  desplazar e ir al estado 31
+    '-'  desplazar e ir al estado 32
+    '*'  desplazar e ir al estado 33
+    '/'  desplazar e ir al estado 34
+    ')'  desplazar e ir al estado 35
+
+
+Estado 31
+
+   17 expr: expr '+' • expr
+
+    ID     desplazar e ir al estado 23
+    VINT   desplazar e ir al estado 24
+    VREAL  desplazar e ir al estado 25
+    VCHAR  desplazar e ir al estado 26
+    '('    desplazar e ir al estado 27
+
+    expr  ir al estado 36
+
+
+Estado 32
+
+   18 expr: expr '-' • expr
+
+    ID     desplazar e ir al estado 23
+    VINT   desplazar e ir al estado 24
+    VREAL  desplazar e ir al estado 25
+    VCHAR  desplazar e ir al estado 26
+    '('    desplazar e ir al estado 27
+
+    expr  ir al estado 37
+
+
+Estado 33
+
+   19 expr: expr '*' • expr
+
+    ID     desplazar e ir al estado 23
+    VINT   desplazar e ir al estado 24
+    VREAL  desplazar e ir al estado 25
+    VCHAR  desplazar e ir al estado 26
+    '('    desplazar e ir al estado 27
+
+    expr  ir al estado 38
+
+
+Estado 34
+
+   20 expr: expr '/' • expr
+
+    ID     desplazar e ir al estado 23
+    VINT   desplazar e ir al estado 24
+    VREAL  desplazar e ir al estado 25
+    VCHAR  desplazar e ir al estado 26
+    '('    desplazar e ir al estado 27
+
+    expr  ir al estado 39
+
+
+Estado 35
+
+   21 expr: '(' expr ')' •
+
+    $default  reduce usando la regla 21 (expr)
+
+
+Estado 36
+
+   17 expr: expr • '+' expr
+   17     | expr '+' expr •
+   18     | expr • '-' expr
+   19     | expr • '*' expr
+   20     | expr • '/' expr
+
+    '*'  desplazar e ir al estado 33
+    '/'  desplazar e ir al estado 34
+
+    $default  reduce usando la regla 17 (expr)
+
+
+Estado 37
+
+   17 expr: expr • '+' expr
+   18     | expr • '-' expr
+   18     | expr '-' expr •
+   19     | expr • '*' expr
+   20     | expr • '/' expr
+
+    '*'  desplazar e ir al estado 33
+    '/'  desplazar e ir al estado 34
+
+    $default  reduce usando la regla 18 (expr)
+
+
+Estado 38
+
+   17 expr: expr • '+' expr
+   18     | expr • '-' expr
+   19     | expr • '*' expr
+   19     | expr '*' expr •
+   20     | expr • '/' expr
+
+    $default  reduce usando la regla 19 (expr)
+
+
+Estado 39
+
+   17 expr: expr • '+' expr
+   18     | expr • '-' expr
+   19     | expr • '*' expr
+   20     | expr • '/' expr
+   20     | expr '/' expr •
+
+    $default  reduce usando la regla 20 (expr)
