@@ -10,8 +10,10 @@
 /****************************************************************************/
 
 
-
-typedef void* sym_value_type;     // 
+/* The type of the value field of symbol table entries                      */
+typedef void* sym_value_type;          /* you will need to replace this    */
+                                        /* with a declaration appropriate   */
+                                        /* for your application.            */
 
 /* Uncomment the following define if bindings should point to rather than   */
 /* contain values.                                                          */
@@ -61,7 +63,7 @@ typedef const char * sym_name_type;     /* If you are using something other */
 /* 1723 1777 1847 1901 1951 2003 2053 2113 2179 2239 2293 2411 2503 2633    */
 /****************************************************************************/
 
-#define SYM_BUCKET_MAX 263
+#define SYM_BUCKET_MAX 269
 
 /* Uncomment SYM_MULTIPLE_NAME_SPACES to support multiple name spaces.      */
 /* #define SYM_MULTIPLE_NAME_SPACES */
@@ -102,7 +104,7 @@ typedef const char * sym_name_type;     /* If you are using something other */
 /* sym_global_enter(), sym_global_lookup() or sym_global_remove() functions */
 /* If SYM_DEEP_BINDING is not defined, then these functions will be         */
 /* not be available even if SYM_REQUIRE_GLOBAL is defined.                  */
-#define SYM_REQUIRE_GLOBAL                                               
+ #define SYM_REQUIRE_GLOBAL                                               
 
 
 /* Uncomment the following to include sym_histogram in the compile          */

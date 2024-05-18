@@ -778,22 +778,22 @@ YY_RULE_SETUP
 case 4:
 YY_RULE_SETUP
 #line 31 "ex1.l"
-{ yylval.value = malloc( yyleng+1 ); strcpy( yylval.value, yytext ); return VAR; }
+{ yylval.name = malloc( yyleng+1 ); strcpy( yylval.name, yytext ); return VAR; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
 #line 32 "ex1.l"
-{ yylval.value = malloc( yyleng+1 ); strcpy( yylval.value, yytext ); return CONST; }
+{ yylval.name = malloc( yyleng+1 ); strcpy( yylval.name, yytext ); return CONST; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
 #line 33 "ex1.l"
-{ yylval.value = malloc( yyleng+1 ); strcpy( yylval.value, yytext ); return PRED; }
+{ yylval.name = malloc( yyleng+1 ); strcpy( yylval.name, yytext ); return PRED; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
 #line 34 "ex1.l"
-{ yylval.value = malloc( yyleng+1 ); strcpy( yylval.value, yytext ); return FUNC; }
+{ yylval.name = malloc( yyleng+1 ); strcpy( yylval.name, yytext ); return FUNC; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP

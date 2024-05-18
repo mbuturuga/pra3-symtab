@@ -1,8 +1,14 @@
 %{
-    #include <stdio.h>
-    #include <stdlib.h>
-    #include <stdarg.h>
-    #include"symtab.h" // Contains the symtab entry definitions
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
+#include"symtab.h" // Contains the symtab entry definitions
+
+// ANSI color codes
+#define RESET   "\033[0m"
+#define RED     "\033[31m"
+#define GREEN   "\033[32m"
 
 
 #define MAX(x,y) (x)>=(y)?x:y
@@ -16,6 +22,9 @@ void yyerror (char const *);
 
 extern FILE * yyin;
 extern FILE * yyout;
+
+void* info = NUL;   
+int error = 0;      // boolean to check if there was an error
 
 // Function to get a string from a format
 char* get_string(char* format, ...){
@@ -32,18 +41,20 @@ char* get_string(char* format, ...){
 
         return str;
     }
+    
 
 %}
 
 %union{
-    char *value;
+    char *name;
+    char *string;
     void *notype;
 }	
 
-%token <value> VAR CONST PRED FUNC 
+%token <name> VAR CONST PRED FUNC 
 %token FORALL EXISTS AND OR NOT IMPLIES IFF EOL
 
-%type <value> formula composite_formula atomic_formula term_list term
+%type <string> formula composite_formula atomic_formula term_list term
 %type <notype> program sentence_list sentence 
 
 %start program    /* specify the start symbol */
@@ -65,20 +76,51 @@ sentence_list: sentence         { $$ = NUL;}
     | sentence_list sentence    { $$ = NUL;}
     ;
 
-sentence: EOL                   {/* empty sentence */ $$ = NUL; }
-    | formula EOL               { printf("Valid formula: %s\n", $1); $$ = NUL; free($1); }
-    | error EOL                 { fprintf(stderr, "Error: Invalid formula at line %d\n", nlin); 
-                                  $$ = NUL; 
-                                  yyerrok; }   
+sentence: EOL                                   {/* empty sentence */ $$ = NUL; }
+    | aux_scope formula EOL aux_end_all_scopes  { fprintf(stdout, GREEN "Valid formula at line %d:\n  %s\n\n" RESET, nlin, $2); $$ = NUL; free($2); }
+    | error EOL aux_end_all_scopes              { fprintf(stderr, RED "Invalid formula at line %d\n\n" RESET, nlin); 
+                                                  $$ = NUL; 
+                                                  yyerrok; }   
     ;
 
-formula: atomic_formula                     { $$ = get_string("%s", $1); free($1); }
-    | composite_formula                     { $$ = get_string("%s", $1); free($1); }
+aux_end_all_scopes: {
+    // Pop all remaining scopes
+    int id_scope = sym_get_scope();
+    while(id_scope >= 0){
+        if(sym_pop_scope() == SYMTAB_OK){
+            // Only print if there was no error
+            if(!error)  printf("Popped scope ID %d\n", id_scope);
+            id_scope = sym_get_scope();
+            }
+        else{
+            fprintf(stderr, "Error: Unable to pop scope at line %d\n", nlin);
+            YYERROR;
+            }
+        }
+    // Reset error flag
+    error = 0;
+    }
+    
+
+aux_end_scope: {
+    // Pop current scope
+    int id_scope = sym_get_scope();
+    if(sym_pop_scope() == SYMTAB_OK){
+        printf("Popped scope ID %d\n", id_scope);
+        }
+    else{
+        fprintf(stderr, "Error: Unable to pop scope at line %d\n", nlin);
+        YYERROR;
+        }
+    }
+
+formula: atomic_formula         { $$ = get_string("%s", $1); free($1); }
+    | composite_formula         { $$ = get_string("%s", $1); free($1); }
     ;
 
 composite_formula: 
-      FORALL aux_scope VAR formula %prec FORALL       { $$ = get_string("forall %s %s", $3, $4); free($3); free($4); }
-    | EXISTS aux_scope VAR formula %prec EXISTS       { $$ = get_string("exists %s %s", $3, $4); free($3); free($4); }
+      FORALL aux_scope VAR aux_var formula %prec FORALL       { $$ = get_string("forall %s %s", $3, $5); free($3); free($5); }
+    | EXISTS aux_scope VAR aux_var formula %prec EXISTS       { $$ = get_string("exists %s %s", $3, $5); free($3); free($5); }
     | NOT formula                           { $$ = get_string("!%s", $2); free($2); }
     | formula AND formula                   { $$ = get_string("(%s and %s)", $1, $3); free($1); free($3); }
     | formula OR formula                    { $$ = get_string("(%s or %s)", $1, $3); free($1); free($3); }
@@ -94,10 +136,25 @@ aux_scope:{
         YYERROR;  
         }
     else{
+        // Push new scope and print it
         int id_scope = sym_get_scope();
-        printf("PUSH scope %d\n", id_scope);
+        printf("Pushed scope ID %d\n", id_scope);
         }
     }
+
+aux_var: {
+    // Add variable to the current scope
+    char* var = $<name>0;
+    if (sym_add(var, &info) == SYMTAB_DUPLICATE){
+        fprintf(stderr, "SEMANTIC ERROR: Variable %s already declared. Line%d\n", var, nlin);
+        error = 1;
+        YYERROR;
+        }
+    else{
+        printf("Added variable %s\n", var);
+        }
+}
+
 
 atomic_formula: PRED '(' term_list ')'      { $$ = get_string("%s(%s)", $1, $3); free($1); free($3); }
     ;
@@ -106,7 +163,16 @@ term_list: term                             { $$ = get_string("%s", $1); free($1
     | term_list ',' term                    { $$ = get_string("%s,%s", $1, $3); free($1); free($3); }
     ;
 
-term: VAR                                   { $$ = get_string("%s", $1); free($1); }                            
+term: VAR                                   { // Check if variable is declared (quantified)
+                                            if (sym_lookup($1, &info) == SYMTAB_NOT_FOUND){
+                                                fprintf(stderr, "SEMANTIC ERROR: Variable %s not quantified. Line %d\n", $1, nlin);
+                                                error = 1;
+                                                YYERROR;
+                                                }
+                                            else{
+                                                $$ = get_string("%s", $1); free($1);
+                                                }
+                                            }                           
     | CONST                                 { $$ = get_string("%s", $1); free($1); }
     | FUNC '(' term_list ')'                { $$ = get_string("%s(%s)", $1, $3); free($1); free($3); }
     ;
@@ -133,7 +199,7 @@ int main( int argc, char *argv[] ) {
     }
 
     // Parse the file
-    printf("Parsing file %s...\n", argv[1]);
+    printf("Parsing file %s...\n\n", argv[1]);
 
     if (yyparse() == 0){
         printf("File parsed successfully.\n");

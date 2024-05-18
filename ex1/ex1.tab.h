@@ -74,12 +74,13 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 38 "ex1.y"
+#line 48 "ex1.y"
 
-    char *value;
+    char *name;
+    char *string;
     void *notype;
 
-#line 83 "ex1.tab.h"
+#line 84 "ex1.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

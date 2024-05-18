@@ -28,10 +28,10 @@ COMMENT     "//".*\n
 {COMMENT}     { /* ignore comments */ nlin++; }
 \n            { nlin++; }
 
-{VARIABLES}   { yylval.value = malloc( yyleng+1 ); strcpy( yylval.value, yytext ); return VAR; }
-{CONSTANTS}   { yylval.value = malloc( yyleng+1 ); strcpy( yylval.value, yytext ); return CONST; }
-{PREDICATES}  { yylval.value = malloc( yyleng+1 ); strcpy( yylval.value, yytext ); return PRED; }
-{FUNCTIONS}   { yylval.value = malloc( yyleng+1 ); strcpy( yylval.value, yytext ); return FUNC; }
+{VARIABLES}   { yylval.name = malloc( yyleng+1 ); strcpy( yylval.name, yytext ); return VAR; }
+{CONSTANTS}   { yylval.name = malloc( yyleng+1 ); strcpy( yylval.name, yytext ); return CONST; }
+{PREDICATES}  { yylval.name = malloc( yyleng+1 ); strcpy( yylval.name, yytext ); return PRED; }
+{FUNCTIONS}   { yylval.name = malloc( yyleng+1 ); strcpy( yylval.name, yytext ); return FUNC; }
 
 forall        { return FORALL; }
 exists        { return EXISTS; }
