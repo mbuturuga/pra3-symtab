@@ -1,0 +1,850 @@
+Estat 49 conflictes: 4 shift/reduce
+Estat 50 conflictes: 4 shift/reduce
+
+
+Gramàtica
+
+    0 $accept: program $end
+
+    1 program: sentence_list
+    2        | ε
+
+    3 sentence_list: sentence
+    4              | sentence_list sentence
+
+    5 sentence: EOL
+    6         | aux_scope formula EOL aux_scope
+    7         | error EOL aux_end_all_scopes
+
+    8 aux_end_all_scopes: ε
+
+    9 aux_end_scope: ε
+
+   10 formula: atomic_formula
+   11        | composite_formula
+
+   12 composite_formula: FORALL aux_scope VAR aux_var formula aux_end_scope
+   13                  | EXISTS aux_scope VAR aux_var formula aux_end_scope
+   14                  | NOT formula
+   15                  | formula AND formula
+   16                  | formula OR formula
+   17                  | formula IMPLIES formula
+   18                  | formula IFF formula
+   19                  | '(' formula ')'
+
+   20 aux_scope: ε
+
+   21 aux_var: ε
+
+   22 atomic_formula: PRED '(' term_list ')'
+
+   23 term_list: term
+   24          | term_list ',' term
+
+   25 term: VAR
+   26     | CONST
+   27     | FUNC '(' term_list ')'
+
+
+Terminals, amb regles on apareixen
+
+    $end (0) 0
+    '(' (40) 19 22 27
+    ')' (41) 19 22 27
+    ',' (44) 24
+    error (256) 7
+    VAR <name> (258) 12 13 25
+    CONST <name> (259) 26
+    PRED <name> (260) 22
+    FUNC <name> (261) 27
+    FORALL (262) 12
+    EXISTS (263) 13
+    AND (264) 15
+    OR (265) 16
+    NOT (266) 14
+    IMPLIES (267) 17
+    IFF (268) 18
+    EOL (269) 5 6 7
+
+
+No-terminals, amb regles on apareixen
+
+    $accept (18)
+        on left: 0
+    program <notype> (19)
+        on left: 1 2
+        on right: 0
+    sentence_list <notype> (20)
+        on left: 3 4
+        on right: 1 4
+    sentence <notype> (21)
+        on left: 5 6 7
+        on right: 3 4
+    aux_end_all_scopes (22)
+        on left: 8
+        on right: 7
+    aux_end_scope (23)
+        on left: 9
+        on right: 12 13
+    formula <string> (24)
+        on left: 10 11
+        on right: 6 12 13 14 15 16 17 18 19
+    composite_formula <string> (25)
+        on left: 12 13 14 15 16 17 18 19
+        on right: 11
+    aux_scope (26)
+        on left: 20
+        on right: 6 12 13
+    aux_var (27)
+        on left: 21
+        on right: 12 13
+    atomic_formula <string> (28)
+        on left: 22
+        on right: 10
+    term_list <string> (29)
+        on left: 23 24
+        on right: 22 24 27
+    term <string> (30)
+        on left: 25 26 27
+        on right: 23 24
+
+
+Estat 0
+
+    0 $accept: • program $end
+
+    error  fes un shift, i ves a l'estat 1
+    EOL    fes un shift, i ves a l'estat 2
+
+    $end    redueix usant la regla 2 (program)
+    PRED    redueix usant la regla 20 (aux_scope)
+    FORALL  redueix usant la regla 20 (aux_scope)
+    EXISTS  redueix usant la regla 20 (aux_scope)
+    NOT     redueix usant la regla 20 (aux_scope)
+    '('     redueix usant la regla 20 (aux_scope)
+
+    program        ves a l'estat 3
+    sentence_list  ves a l'estat 4
+    sentence       ves a l'estat 5
+    aux_scope      ves a l'estat 6
+
+
+Estat 1
+
+    7 sentence: error • EOL aux_end_all_scopes
+
+    EOL  fes un shift, i ves a l'estat 7
+
+
+Estat 2
+
+    5 sentence: EOL •
+
+    $default  redueix usant la regla 5 (sentence)
+
+
+Estat 3
+
+    0 $accept: program • $end
+
+    $end  fes un shift, i ves a l'estat 8
+
+
+Estat 4
+
+    1 program: sentence_list •
+    4 sentence_list: sentence_list • sentence
+
+    error  fes un shift, i ves a l'estat 1
+    EOL    fes un shift, i ves a l'estat 2
+
+    $end    redueix usant la regla 1 (program)
+    PRED    redueix usant la regla 20 (aux_scope)
+    FORALL  redueix usant la regla 20 (aux_scope)
+    EXISTS  redueix usant la regla 20 (aux_scope)
+    NOT     redueix usant la regla 20 (aux_scope)
+    '('     redueix usant la regla 20 (aux_scope)
+
+    sentence   ves a l'estat 9
+    aux_scope  ves a l'estat 6
+
+
+Estat 5
+
+    3 sentence_list: sentence •
+
+    $default  redueix usant la regla 3 (sentence_list)
+
+
+Estat 6
+
+    6 sentence: aux_scope • formula EOL aux_scope
+
+    PRED    fes un shift, i ves a l'estat 10
+    FORALL  fes un shift, i ves a l'estat 11
+    EXISTS  fes un shift, i ves a l'estat 12
+    NOT     fes un shift, i ves a l'estat 13
+    '('     fes un shift, i ves a l'estat 14
+
+    formula            ves a l'estat 15
+    composite_formula  ves a l'estat 16
+    atomic_formula     ves a l'estat 17
+
+
+Estat 7
+
+    7 sentence: error EOL • aux_end_all_scopes
+
+    $default  redueix usant la regla 8 (aux_end_all_scopes)
+
+    aux_end_all_scopes  ves a l'estat 18
+
+
+Estat 8
+
+    0 $accept: program $end •
+
+    $default  accepta
+
+
+Estat 9
+
+    4 sentence_list: sentence_list sentence •
+
+    $default  redueix usant la regla 4 (sentence_list)
+
+
+Estat 10
+
+   22 atomic_formula: PRED • '(' term_list ')'
+
+    '('  fes un shift, i ves a l'estat 19
+
+
+Estat 11
+
+   12 composite_formula: FORALL • aux_scope VAR aux_var formula aux_end_scope
+
+    $default  redueix usant la regla 20 (aux_scope)
+
+    aux_scope  ves a l'estat 20
+
+
+Estat 12
+
+   13 composite_formula: EXISTS • aux_scope VAR aux_var formula aux_end_scope
+
+    $default  redueix usant la regla 20 (aux_scope)
+
+    aux_scope  ves a l'estat 21
+
+
+Estat 13
+
+   14 composite_formula: NOT • formula
+
+    PRED    fes un shift, i ves a l'estat 10
+    FORALL  fes un shift, i ves a l'estat 11
+    EXISTS  fes un shift, i ves a l'estat 12
+    NOT     fes un shift, i ves a l'estat 13
+    '('     fes un shift, i ves a l'estat 14
+
+    formula            ves a l'estat 22
+    composite_formula  ves a l'estat 16
+    atomic_formula     ves a l'estat 17
+
+
+Estat 14
+
+   19 composite_formula: '(' • formula ')'
+
+    PRED    fes un shift, i ves a l'estat 10
+    FORALL  fes un shift, i ves a l'estat 11
+    EXISTS  fes un shift, i ves a l'estat 12
+    NOT     fes un shift, i ves a l'estat 13
+    '('     fes un shift, i ves a l'estat 14
+
+    formula            ves a l'estat 23
+    composite_formula  ves a l'estat 16
+    atomic_formula     ves a l'estat 17
+
+
+Estat 15
+
+    6 sentence: aux_scope formula • EOL aux_scope
+   15 composite_formula: formula • AND formula
+   16                  | formula • OR formula
+   17                  | formula • IMPLIES formula
+   18                  | formula • IFF formula
+
+    AND      fes un shift, i ves a l'estat 24
+    OR       fes un shift, i ves a l'estat 25
+    IMPLIES  fes un shift, i ves a l'estat 26
+    IFF      fes un shift, i ves a l'estat 27
+    EOL      fes un shift, i ves a l'estat 28
+
+
+Estat 16
+
+   11 formula: composite_formula •
+
+    $default  redueix usant la regla 11 (formula)
+
+
+Estat 17
+
+   10 formula: atomic_formula •
+
+    $default  redueix usant la regla 10 (formula)
+
+
+Estat 18
+
+    7 sentence: error EOL aux_end_all_scopes •
+
+    $default  redueix usant la regla 7 (sentence)
+
+
+Estat 19
+
+   22 atomic_formula: PRED '(' • term_list ')'
+
+    VAR    fes un shift, i ves a l'estat 29
+    CONST  fes un shift, i ves a l'estat 30
+    FUNC   fes un shift, i ves a l'estat 31
+
+    term_list  ves a l'estat 32
+    term       ves a l'estat 33
+
+
+Estat 20
+
+   12 composite_formula: FORALL aux_scope • VAR aux_var formula aux_end_scope
+
+    VAR  fes un shift, i ves a l'estat 34
+
+
+Estat 21
+
+   13 composite_formula: EXISTS aux_scope • VAR aux_var formula aux_end_scope
+
+    VAR  fes un shift, i ves a l'estat 35
+
+
+Estat 22
+
+   14 composite_formula: NOT formula •
+   15                  | formula • AND formula
+   16                  | formula • OR formula
+   17                  | formula • IMPLIES formula
+   18                  | formula • IFF formula
+
+    $default  redueix usant la regla 14 (composite_formula)
+
+
+Estat 23
+
+   15 composite_formula: formula • AND formula
+   16                  | formula • OR formula
+   17                  | formula • IMPLIES formula
+   18                  | formula • IFF formula
+   19                  | '(' formula • ')'
+
+    AND      fes un shift, i ves a l'estat 24
+    OR       fes un shift, i ves a l'estat 25
+    IMPLIES  fes un shift, i ves a l'estat 26
+    IFF      fes un shift, i ves a l'estat 27
+    ')'      fes un shift, i ves a l'estat 36
+
+
+Estat 24
+
+   15 composite_formula: formula AND • formula
+
+    PRED    fes un shift, i ves a l'estat 10
+    FORALL  fes un shift, i ves a l'estat 11
+    EXISTS  fes un shift, i ves a l'estat 12
+    NOT     fes un shift, i ves a l'estat 13
+    '('     fes un shift, i ves a l'estat 14
+
+    formula            ves a l'estat 37
+    composite_formula  ves a l'estat 16
+    atomic_formula     ves a l'estat 17
+
+
+Estat 25
+
+   16 composite_formula: formula OR • formula
+
+    PRED    fes un shift, i ves a l'estat 10
+    FORALL  fes un shift, i ves a l'estat 11
+    EXISTS  fes un shift, i ves a l'estat 12
+    NOT     fes un shift, i ves a l'estat 13
+    '('     fes un shift, i ves a l'estat 14
+
+    formula            ves a l'estat 38
+    composite_formula  ves a l'estat 16
+    atomic_formula     ves a l'estat 17
+
+
+Estat 26
+
+   17 composite_formula: formula IMPLIES • formula
+
+    PRED    fes un shift, i ves a l'estat 10
+    FORALL  fes un shift, i ves a l'estat 11
+    EXISTS  fes un shift, i ves a l'estat 12
+    NOT     fes un shift, i ves a l'estat 13
+    '('     fes un shift, i ves a l'estat 14
+
+    formula            ves a l'estat 39
+    composite_formula  ves a l'estat 16
+    atomic_formula     ves a l'estat 17
+
+
+Estat 27
+
+   18 composite_formula: formula IFF • formula
+
+    PRED    fes un shift, i ves a l'estat 10
+    FORALL  fes un shift, i ves a l'estat 11
+    EXISTS  fes un shift, i ves a l'estat 12
+    NOT     fes un shift, i ves a l'estat 13
+    '('     fes un shift, i ves a l'estat 14
+
+    formula            ves a l'estat 40
+    composite_formula  ves a l'estat 16
+    atomic_formula     ves a l'estat 17
+
+
+Estat 28
+
+    6 sentence: aux_scope formula EOL • aux_scope
+
+    $default  redueix usant la regla 20 (aux_scope)
+
+    aux_scope  ves a l'estat 41
+
+
+Estat 29
+
+   25 term: VAR •
+
+    $default  redueix usant la regla 25 (term)
+
+
+Estat 30
+
+   26 term: CONST •
+
+    $default  redueix usant la regla 26 (term)
+
+
+Estat 31
+
+   27 term: FUNC • '(' term_list ')'
+
+    '('  fes un shift, i ves a l'estat 42
+
+
+Estat 32
+
+   22 atomic_formula: PRED '(' term_list • ')'
+   24 term_list: term_list • ',' term
+
+    ')'  fes un shift, i ves a l'estat 43
+    ','  fes un shift, i ves a l'estat 44
+
+
+Estat 33
+
+   23 term_list: term •
+
+    $default  redueix usant la regla 23 (term_list)
+
+
+Estat 34
+
+   12 composite_formula: FORALL aux_scope VAR • aux_var formula aux_end_scope
+
+    $default  redueix usant la regla 21 (aux_var)
+
+    aux_var  ves a l'estat 45
+
+
+Estat 35
+
+   13 composite_formula: EXISTS aux_scope VAR • aux_var formula aux_end_scope
+
+    $default  redueix usant la regla 21 (aux_var)
+
+    aux_var  ves a l'estat 46
+
+
+Estat 36
+
+   19 composite_formula: '(' formula ')' •
+
+    $default  redueix usant la regla 19 (composite_formula)
+
+
+Estat 37
+
+   15 composite_formula: formula • AND formula
+   15                  | formula AND formula •
+   16                  | formula • OR formula
+   17                  | formula • IMPLIES formula
+   18                  | formula • IFF formula
+
+    $default  redueix usant la regla 15 (composite_formula)
+
+
+Estat 38
+
+   15 composite_formula: formula • AND formula
+   16                  | formula • OR formula
+   16                  | formula OR formula •
+   17                  | formula • IMPLIES formula
+   18                  | formula • IFF formula
+
+    AND  fes un shift, i ves a l'estat 24
+
+    $default  redueix usant la regla 16 (composite_formula)
+
+
+Estat 39
+
+   15 composite_formula: formula • AND formula
+   16                  | formula • OR formula
+   17                  | formula • IMPLIES formula
+   17                  | formula IMPLIES formula •
+   18                  | formula • IFF formula
+
+    AND  fes un shift, i ves a l'estat 24
+    OR   fes un shift, i ves a l'estat 25
+
+    $default  redueix usant la regla 17 (composite_formula)
+
+
+Estat 40
+
+   15 composite_formula: formula • AND formula
+   16                  | formula • OR formula
+   17                  | formula • IMPLIES formula
+   18                  | formula • IFF formula
+   18                  | formula IFF formula •
+
+    AND  fes un shift, i ves a l'estat 24
+    OR   fes un shift, i ves a l'estat 25
+
+    $default  redueix usant la regla 18 (composite_formula)
+
+
+Estat 41
+
+    6 sentence: aux_scope formula EOL aux_scope •
+
+    $default  redueix usant la regla 6 (sentence)
+
+
+Estat 42
+
+   27 term: FUNC '(' • term_list ')'
+
+    VAR    fes un shift, i ves a l'estat 29
+    CONST  fes un shift, i ves a l'estat 30
+    FUNC   fes un shift, i ves a l'estat 31
+
+    term_list  ves a l'estat 47
+    term       ves a l'estat 33
+
+
+Estat 43
+
+   22 atomic_formula: PRED '(' term_list ')' •
+
+    $default  redueix usant la regla 22 (atomic_formula)
+
+
+Estat 44
+
+   24 term_list: term_list ',' • term
+
+    VAR    fes un shift, i ves a l'estat 29
+    CONST  fes un shift, i ves a l'estat 30
+    FUNC   fes un shift, i ves a l'estat 31
+
+    term  ves a l'estat 48
+
+
+Estat 45
+
+   12 composite_formula: FORALL aux_scope VAR aux_var • formula aux_end_scope
+
+    PRED    fes un shift, i ves a l'estat 10
+    FORALL  fes un shift, i ves a l'estat 11
+    EXISTS  fes un shift, i ves a l'estat 12
+    NOT     fes un shift, i ves a l'estat 13
+    '('     fes un shift, i ves a l'estat 14
+
+    formula            ves a l'estat 49
+    composite_formula  ves a l'estat 16
+    atomic_formula     ves a l'estat 17
+
+
+Estat 46
+
+   13 composite_formula: EXISTS aux_scope VAR aux_var • formula aux_end_scope
+
+    PRED    fes un shift, i ves a l'estat 10
+    FORALL  fes un shift, i ves a l'estat 11
+    EXISTS  fes un shift, i ves a l'estat 12
+    NOT     fes un shift, i ves a l'estat 13
+    '('     fes un shift, i ves a l'estat 14
+
+    formula            ves a l'estat 50
+    composite_formula  ves a l'estat 16
+    atomic_formula     ves a l'estat 17
+
+
+Estat 47
+
+   24 term_list: term_list • ',' term
+   27 term: FUNC '(' term_list • ')'
+
+    ')'  fes un shift, i ves a l'estat 51
+    ','  fes un shift, i ves a l'estat 44
+
+
+Estat 48
+
+   24 term_list: term_list ',' term •
+
+    $default  redueix usant la regla 24 (term_list)
+
+
+Estat 49
+
+   12 composite_formula: FORALL aux_scope VAR aux_var formula • aux_end_scope
+   15                  | formula • AND formula
+   16                  | formula • OR formula
+   17                  | formula • IMPLIES formula
+   18                  | formula • IFF formula
+
+    AND      fes un shift, i ves a l'estat 24
+    OR       fes un shift, i ves a l'estat 25
+    IMPLIES  fes un shift, i ves a l'estat 26
+    IFF      fes un shift, i ves a l'estat 27
+
+    AND       [redueix usant la regla 9 (aux_end_scope)]
+    OR        [redueix usant la regla 9 (aux_end_scope)]
+    IMPLIES   [redueix usant la regla 9 (aux_end_scope)]
+    IFF       [redueix usant la regla 9 (aux_end_scope)]
+    $default  redueix usant la regla 9 (aux_end_scope)
+
+    aux_end_scope  ves a l'estat 52
+
+    shift/reduce conflict on token AND:
+        9 aux_end_scope: ε •
+       15 composite_formula: formula • AND formula
+      Example: FORALL aux_scope VAR aux_var FORALL aux_scope VAR aux_var formula • AND formula aux_end_scope
+      Shift derivation
+        composite_formula
+        ↳ 12: FORALL aux_scope VAR aux_var formula                                                                                  aux_end_scope
+                                           ↳ 11: composite_formula                                                                  ↳ 12: ε
+                                                 ↳ 12: FORALL aux_scope VAR aux_var formula                           aux_end_scope
+                                                                                    ↳ 11: composite_formula
+                                                                                          ↳ 15: formula • AND formula
+      Reduce derivation
+        composite_formula
+        ↳ 12: FORALL aux_scope VAR aux_var formula                                                                                aux_end_scope
+                                           ↳ 11: composite_formula
+                                                 ↳ 15: formula                                                        AND formula
+                                                       ↳ 11: composite_formula
+                                                             ↳ 12: FORALL aux_scope VAR aux_var formula aux_end_scope
+                                                                                                        ↳ 9: ε •
+
+    shift/reduce conflict on token OR:
+        9 aux_end_scope: ε •
+       16 composite_formula: formula • OR formula
+      Example: FORALL aux_scope VAR aux_var FORALL aux_scope VAR aux_var formula • OR formula aux_end_scope
+      Shift derivation
+        composite_formula
+        ↳ 12: FORALL aux_scope VAR aux_var formula                                                                                 aux_end_scope
+                                           ↳ 11: composite_formula                                                                 ↳ 12: ε
+                                                 ↳ 12: FORALL aux_scope VAR aux_var formula                          aux_end_scope
+                                                                                    ↳ 11: composite_formula
+                                                                                          ↳ 16: formula • OR formula
+      Reduce derivation
+        composite_formula
+        ↳ 12: FORALL aux_scope VAR aux_var formula                                                                               aux_end_scope
+                                           ↳ 11: composite_formula
+                                                 ↳ 16: formula                                                        OR formula
+                                                       ↳ 11: composite_formula
+                                                             ↳ 12: FORALL aux_scope VAR aux_var formula aux_end_scope
+                                                                                                        ↳ 9: ε •
+
+    shift/reduce conflict on token IMPLIES:
+        9 aux_end_scope: ε •
+       17 composite_formula: formula • IMPLIES formula
+      Example: FORALL aux_scope VAR aux_var FORALL aux_scope VAR aux_var formula • IMPLIES formula aux_end_scope
+      Shift derivation
+        composite_formula
+        ↳ 12: FORALL aux_scope VAR aux_var formula                                                                                      aux_end_scope
+                                           ↳ 11: composite_formula                                                                      ↳ 12: ε
+                                                 ↳ 12: FORALL aux_scope VAR aux_var formula                               aux_end_scope
+                                                                                    ↳ 11: composite_formula
+                                                                                          ↳ 17: formula • IMPLIES formula
+      Reduce derivation
+        composite_formula
+        ↳ 12: FORALL aux_scope VAR aux_var formula                                                                                    aux_end_scope
+                                           ↳ 11: composite_formula
+                                                 ↳ 17: formula                                                        IMPLIES formula
+                                                       ↳ 11: composite_formula
+                                                             ↳ 12: FORALL aux_scope VAR aux_var formula aux_end_scope
+                                                                                                        ↳ 9: ε •
+
+    shift/reduce conflict on token IFF:
+        9 aux_end_scope: ε •
+       18 composite_formula: formula • IFF formula
+      Example: FORALL aux_scope VAR aux_var FORALL aux_scope VAR aux_var formula • IFF formula aux_end_scope
+      Shift derivation
+        composite_formula
+        ↳ 12: FORALL aux_scope VAR aux_var formula                                                                                  aux_end_scope
+                                           ↳ 11: composite_formula                                                                  ↳ 12: ε
+                                                 ↳ 12: FORALL aux_scope VAR aux_var formula                           aux_end_scope
+                                                                                    ↳ 11: composite_formula
+                                                                                          ↳ 18: formula • IFF formula
+      Reduce derivation
+        composite_formula
+        ↳ 12: FORALL aux_scope VAR aux_var formula                                                                                aux_end_scope
+                                           ↳ 11: composite_formula
+                                                 ↳ 18: formula                                                        IFF formula
+                                                       ↳ 11: composite_formula
+                                                             ↳ 12: FORALL aux_scope VAR aux_var formula aux_end_scope
+                                                                                                        ↳ 9: ε •
+
+
+
+Estat 50
+
+   13 composite_formula: EXISTS aux_scope VAR aux_var formula • aux_end_scope
+   15                  | formula • AND formula
+   16                  | formula • OR formula
+   17                  | formula • IMPLIES formula
+   18                  | formula • IFF formula
+
+    AND      fes un shift, i ves a l'estat 24
+    OR       fes un shift, i ves a l'estat 25
+    IMPLIES  fes un shift, i ves a l'estat 26
+    IFF      fes un shift, i ves a l'estat 27
+
+    AND       [redueix usant la regla 9 (aux_end_scope)]
+    OR        [redueix usant la regla 9 (aux_end_scope)]
+    IMPLIES   [redueix usant la regla 9 (aux_end_scope)]
+    IFF       [redueix usant la regla 9 (aux_end_scope)]
+    $default  redueix usant la regla 9 (aux_end_scope)
+
+    aux_end_scope  ves a l'estat 53
+
+    shift/reduce conflict on token AND:
+        9 aux_end_scope: ε •
+       15 composite_formula: formula • AND formula
+      Example: EXISTS aux_scope VAR aux_var EXISTS aux_scope VAR aux_var formula • AND formula aux_end_scope
+      Shift derivation
+        composite_formula
+        ↳ 13: EXISTS aux_scope VAR aux_var formula                                                                                  aux_end_scope
+                                           ↳ 11: composite_formula                                                                  ↳ 13: ε
+                                                 ↳ 13: EXISTS aux_scope VAR aux_var formula                           aux_end_scope
+                                                                                    ↳ 11: composite_formula
+                                                                                          ↳ 15: formula • AND formula
+      Reduce derivation
+        composite_formula
+        ↳ 13: EXISTS aux_scope VAR aux_var formula                                                                                aux_end_scope
+                                           ↳ 11: composite_formula
+                                                 ↳ 15: formula                                                        AND formula
+                                                       ↳ 11: composite_formula
+                                                             ↳ 13: EXISTS aux_scope VAR aux_var formula aux_end_scope
+                                                                                                        ↳ 9: ε •
+
+    shift/reduce conflict on token OR:
+        9 aux_end_scope: ε •
+       16 composite_formula: formula • OR formula
+      Example: EXISTS aux_scope VAR aux_var EXISTS aux_scope VAR aux_var formula • OR formula aux_end_scope
+      Shift derivation
+        composite_formula
+        ↳ 13: EXISTS aux_scope VAR aux_var formula                                                                                 aux_end_scope
+                                           ↳ 11: composite_formula                                                                 ↳ 13: ε
+                                                 ↳ 13: EXISTS aux_scope VAR aux_var formula                          aux_end_scope
+                                                                                    ↳ 11: composite_formula
+                                                                                          ↳ 16: formula • OR formula
+      Reduce derivation
+        composite_formula
+        ↳ 13: EXISTS aux_scope VAR aux_var formula                                                                               aux_end_scope
+                                           ↳ 11: composite_formula
+                                                 ↳ 16: formula                                                        OR formula
+                                                       ↳ 11: composite_formula
+                                                             ↳ 13: EXISTS aux_scope VAR aux_var formula aux_end_scope
+                                                                                                        ↳ 9: ε •
+
+    shift/reduce conflict on token IMPLIES:
+        9 aux_end_scope: ε •
+       17 composite_formula: formula • IMPLIES formula
+      Example: EXISTS aux_scope VAR aux_var EXISTS aux_scope VAR aux_var formula • IMPLIES formula aux_end_scope
+      Shift derivation
+        composite_formula
+        ↳ 13: EXISTS aux_scope VAR aux_var formula                                                                                      aux_end_scope
+                                           ↳ 11: composite_formula                                                                      ↳ 13: ε
+                                                 ↳ 13: EXISTS aux_scope VAR aux_var formula                               aux_end_scope
+                                                                                    ↳ 11: composite_formula
+                                                                                          ↳ 17: formula • IMPLIES formula
+      Reduce derivation
+        composite_formula
+        ↳ 13: EXISTS aux_scope VAR aux_var formula                                                                                    aux_end_scope
+                                           ↳ 11: composite_formula
+                                                 ↳ 17: formula                                                        IMPLIES formula
+                                                       ↳ 11: composite_formula
+                                                             ↳ 13: EXISTS aux_scope VAR aux_var formula aux_end_scope
+                                                                                                        ↳ 9: ε •
+
+    shift/reduce conflict on token IFF:
+        9 aux_end_scope: ε •
+       18 composite_formula: formula • IFF formula
+      Example: EXISTS aux_scope VAR aux_var EXISTS aux_scope VAR aux_var formula • IFF formula aux_end_scope
+      Shift derivation
+        composite_formula
+        ↳ 13: EXISTS aux_scope VAR aux_var formula                                                                                  aux_end_scope
+                                           ↳ 11: composite_formula                                                                  ↳ 13: ε
+                                                 ↳ 13: EXISTS aux_scope VAR aux_var formula                           aux_end_scope
+                                                                                    ↳ 11: composite_formula
+                                                                                          ↳ 18: formula • IFF formula
+      Reduce derivation
+        composite_formula
+        ↳ 13: EXISTS aux_scope VAR aux_var formula                                                                                aux_end_scope
+                                           ↳ 11: composite_formula
+                                                 ↳ 18: formula                                                        IFF formula
+                                                       ↳ 11: composite_formula
+                                                             ↳ 13: EXISTS aux_scope VAR aux_var formula aux_end_scope
+                                                                                                        ↳ 9: ε •
+
+
+
+Estat 51
+
+   27 term: FUNC '(' term_list ')' •
+
+    $default  redueix usant la regla 27 (term)
+
+
+Estat 52
+
+   12 composite_formula: FORALL aux_scope VAR aux_var formula aux_end_scope •
+
+    $default  redueix usant la regla 12 (composite_formula)
+
+
+Estat 53
+
+   13 composite_formula: EXISTS aux_scope VAR aux_var formula aux_end_scope •
+
+    $default  redueix usant la regla 13 (composite_formula)
