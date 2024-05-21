@@ -1,0 +1,35 @@
+// Declaració identificadors + assignació de tipus bàsics
+// 3 tipus bàsics: caracter int real
+
+int a,b,c;
+
+a=4;
+b=56*7+2;
+c=a+b;
+
+float e,f,g;
+
+e=6.7E-4;
+
+f=e*5/2;
+
+g=e+f;
+
+f=a+b;
+
+// Error tipus
+
+a=f*2;
+
+// Error tipus
+
+
+b=e+f;
+
+// Error instrucció incorrecta!!
+
+a;
+
+;
+
+
