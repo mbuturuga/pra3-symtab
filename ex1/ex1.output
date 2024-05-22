@@ -1,13 +1,3 @@
-No terminales inútiles en la gramática
-
-    aux_end_scope
-
-
-Reglas inútiles en la gramática
-
-   27 aux_end_scope: ε
-
-
 Gramática
 
     0 $accept: program $end
@@ -19,55 +9,57 @@ Gramática
     4              | sentence_list sentence
 
     5 sentence: EOL
-    6         | aux_scope formula EOL aux_end_all_scopes
+    6         | aux_scope formula EOL aux_end_scope
     7         | error EOL aux_end_all_scopes
 
-    8 aux_end_all_scopes: ε
+    8 aux_scope: ε
 
-    9 formula: atomic_formula
-   10        | composite_formula
+    9 aux_end_scope: ε
 
-   11 composite_formula: FORALL aux_scope VAR aux_var formula
-   12                  | EXISTS aux_scope VAR aux_var formula
-   13                  | NOT formula
-   14                  | formula AND formula
-   15                  | formula OR formula
-   16                  | formula IMPLIES formula
-   17                  | formula IFF formula
-   18                  | '(' formula ')'
+   10 aux_end_all_scopes: ε
 
-   19 aux_scope: ε
+   11 formula: atomic_formula
+   12        | composite_formula
 
-   20 aux_var: ε
+   13 composite_formula: FORALL aux_scope VAR aux_var formula aux_end_scope
+   14                  | EXISTS aux_scope VAR aux_var formula aux_end_scope
+   15                  | NOT formula
+   16                  | formula AND formula
+   17                  | formula OR formula
+   18                  | formula IMPLIES formula
+   19                  | formula IFF formula
+   20                  | '(' formula ')'
 
-   21 atomic_formula: PRED '(' term_list ')'
+   21 aux_var: ε
 
-   22 term_list: term
-   23          | term_list ',' term
+   22 atomic_formula: PRED '(' term_list ')'
 
-   24 term: VAR
-   25     | CONST
-   26     | FUNC '(' term_list ')'
+   23 term_list: term
+   24          | term_list ',' term
+
+   25 term: VAR
+   26     | CONST
+   27     | FUNC '(' term_list ')'
 
 
 Terminales con las reglas donde aparecen
 
     $end (0) 0
-    '(' (40) 18 21 26
-    ')' (41) 18 21 26
-    ',' (44) 23
+    '(' (40) 20 22 27
+    ')' (41) 20 22 27
+    ',' (44) 24
     error (256) 7
-    VAR <name> (258) 11 12 24
-    CONST <name> (259) 25
-    PRED <name> (260) 21
-    FUNC <name> (261) 26
-    FORALL (262) 11
-    EXISTS (263) 12
-    AND (264) 14
-    OR (265) 15
-    NOT (266) 13
-    IMPLIES (267) 16
-    IFF (268) 17
+    VAR <name> (258) 13 14 25
+    CONST <name> (259) 26
+    PRED <name> (260) 22
+    FUNC <name> (261) 27
+    FORALL (262) 13
+    EXISTS (263) 14
+    AND (264) 16
+    OR (265) 17
+    NOT (266) 15
+    IMPLIES (267) 18
+    IFF (268) 19
     EOL (269) 5 6 7
 
 
@@ -84,30 +76,33 @@ No terminales con las reglas donde aparecen
     sentence <notype> (21)
         on left: 5 6 7
         on right: 3 4
-    aux_end_all_scopes (22)
+    aux_scope (22)
         on left: 8
-        on right: 6 7
-    formula <string> (23)
-        on left: 9 10
-        on right: 6 11 12 13 14 15 16 17 18
-    composite_formula <string> (24)
-        on left: 11 12 13 14 15 16 17 18
-        on right: 10
-    aux_scope (25)
-        on left: 19
-        on right: 6 11 12
-    aux_var (26)
-        on left: 20
-        on right: 11 12
-    atomic_formula <string> (27)
+        on right: 6 13 14
+    aux_end_scope (23)
+        on left: 9
+        on right: 6 13 14
+    aux_end_all_scopes (24)
+        on left: 10
+        on right: 7
+    formula <string> (25)
+        on left: 11 12
+        on right: 6 13 14 15 16 17 18 19 20
+    composite_formula <string> (26)
+        on left: 13 14 15 16 17 18 19 20
+        on right: 12
+    aux_var (27)
         on left: 21
-        on right: 9
-    term_list <string> (28)
-        on left: 22 23
-        on right: 21 23 26
-    term <string> (29)
-        on left: 24 25 26
-        on right: 22 23
+        on right: 13 14
+    atomic_formula <string> (28)
+        on left: 22
+        on right: 11
+    term_list <string> (29)
+        on left: 23 24
+        on right: 22 24 27
+    term <string> (30)
+        on left: 25 26 27
+        on right: 23 24
 
 
 Estado 0
@@ -118,11 +113,11 @@ Estado 0
     EOL    desplazar e ir al estado 2
 
     $end    reduce usando la regla 2 (program)
-    PRED    reduce usando la regla 19 (aux_scope)
-    FORALL  reduce usando la regla 19 (aux_scope)
-    EXISTS  reduce usando la regla 19 (aux_scope)
-    NOT     reduce usando la regla 19 (aux_scope)
-    '('     reduce usando la regla 19 (aux_scope)
+    PRED    reduce usando la regla 8 (aux_scope)
+    FORALL  reduce usando la regla 8 (aux_scope)
+    EXISTS  reduce usando la regla 8 (aux_scope)
+    NOT     reduce usando la regla 8 (aux_scope)
+    '('     reduce usando la regla 8 (aux_scope)
 
     program        ir al estado 3
     sentence_list  ir al estado 4
@@ -160,11 +155,11 @@ Estado 4
     EOL    desplazar e ir al estado 2
 
     $end    reduce usando la regla 1 (program)
-    PRED    reduce usando la regla 19 (aux_scope)
-    FORALL  reduce usando la regla 19 (aux_scope)
-    EXISTS  reduce usando la regla 19 (aux_scope)
-    NOT     reduce usando la regla 19 (aux_scope)
-    '('     reduce usando la regla 19 (aux_scope)
+    PRED    reduce usando la regla 8 (aux_scope)
+    FORALL  reduce usando la regla 8 (aux_scope)
+    EXISTS  reduce usando la regla 8 (aux_scope)
+    NOT     reduce usando la regla 8 (aux_scope)
+    '('     reduce usando la regla 8 (aux_scope)
 
     sentence   ir al estado 9
     aux_scope  ir al estado 6
@@ -179,7 +174,7 @@ Estado 5
 
 Estado 6
 
-    6 sentence: aux_scope • formula EOL aux_end_all_scopes
+    6 sentence: aux_scope • formula EOL aux_end_scope
 
     PRED    desplazar e ir al estado 10
     FORALL  desplazar e ir al estado 11
@@ -196,7 +191,7 @@ Estado 7
 
     7 sentence: error EOL • aux_end_all_scopes
 
-    $default  reduce usando la regla 8 (aux_end_all_scopes)
+    $default  reduce usando la regla 10 (aux_end_all_scopes)
 
     aux_end_all_scopes  ir al estado 18
 
@@ -217,32 +212,32 @@ Estado 9
 
 Estado 10
 
-   21 atomic_formula: PRED • '(' term_list ')'
+   22 atomic_formula: PRED • '(' term_list ')'
 
     '('  desplazar e ir al estado 19
 
 
 Estado 11
 
-   11 composite_formula: FORALL • aux_scope VAR aux_var formula
+   13 composite_formula: FORALL • aux_scope VAR aux_var formula aux_end_scope
 
-    $default  reduce usando la regla 19 (aux_scope)
+    $default  reduce usando la regla 8 (aux_scope)
 
     aux_scope  ir al estado 20
 
 
 Estado 12
 
-   12 composite_formula: EXISTS • aux_scope VAR aux_var formula
+   14 composite_formula: EXISTS • aux_scope VAR aux_var formula aux_end_scope
 
-    $default  reduce usando la regla 19 (aux_scope)
+    $default  reduce usando la regla 8 (aux_scope)
 
     aux_scope  ir al estado 21
 
 
 Estado 13
 
-   13 composite_formula: NOT • formula
+   15 composite_formula: NOT • formula
 
     PRED    desplazar e ir al estado 10
     FORALL  desplazar e ir al estado 11
@@ -257,7 +252,7 @@ Estado 13
 
 Estado 14
 
-   18 composite_formula: '(' • formula ')'
+   20 composite_formula: '(' • formula ')'
 
     PRED    desplazar e ir al estado 10
     FORALL  desplazar e ir al estado 11
@@ -272,11 +267,11 @@ Estado 14
 
 Estado 15
 
-    6 sentence: aux_scope formula • EOL aux_end_all_scopes
-   14 composite_formula: formula • AND formula
-   15                  | formula • OR formula
-   16                  | formula • IMPLIES formula
-   17                  | formula • IFF formula
+    6 sentence: aux_scope formula • EOL aux_end_scope
+   16 composite_formula: formula • AND formula
+   17                  | formula • OR formula
+   18                  | formula • IMPLIES formula
+   19                  | formula • IFF formula
 
     AND      desplazar e ir al estado 24
     OR       desplazar e ir al estado 25
@@ -287,16 +282,16 @@ Estado 15
 
 Estado 16
 
-   10 formula: composite_formula •
+   12 formula: composite_formula •
 
-    $default  reduce usando la regla 10 (formula)
+    $default  reduce usando la regla 12 (formula)
 
 
 Estado 17
 
-    9 formula: atomic_formula •
+   11 formula: atomic_formula •
 
-    $default  reduce usando la regla 9 (formula)
+    $default  reduce usando la regla 11 (formula)
 
 
 Estado 18
@@ -308,7 +303,7 @@ Estado 18
 
 Estado 19
 
-   21 atomic_formula: PRED '(' • term_list ')'
+   22 atomic_formula: PRED '(' • term_list ')'
 
     VAR    desplazar e ir al estado 29
     CONST  desplazar e ir al estado 30
@@ -320,36 +315,36 @@ Estado 19
 
 Estado 20
 
-   11 composite_formula: FORALL aux_scope • VAR aux_var formula
+   13 composite_formula: FORALL aux_scope • VAR aux_var formula aux_end_scope
 
     VAR  desplazar e ir al estado 34
 
 
 Estado 21
 
-   12 composite_formula: EXISTS aux_scope • VAR aux_var formula
+   14 composite_formula: EXISTS aux_scope • VAR aux_var formula aux_end_scope
 
     VAR  desplazar e ir al estado 35
 
 
 Estado 22
 
-   13 composite_formula: NOT formula •
-   14                  | formula • AND formula
-   15                  | formula • OR formula
-   16                  | formula • IMPLIES formula
-   17                  | formula • IFF formula
+   15 composite_formula: NOT formula •
+   16                  | formula • AND formula
+   17                  | formula • OR formula
+   18                  | formula • IMPLIES formula
+   19                  | formula • IFF formula
 
-    $default  reduce usando la regla 13 (composite_formula)
+    $default  reduce usando la regla 15 (composite_formula)
 
 
 Estado 23
 
-   14 composite_formula: formula • AND formula
-   15                  | formula • OR formula
-   16                  | formula • IMPLIES formula
-   17                  | formula • IFF formula
-   18                  | '(' formula • ')'
+   16 composite_formula: formula • AND formula
+   17                  | formula • OR formula
+   18                  | formula • IMPLIES formula
+   19                  | formula • IFF formula
+   20                  | '(' formula • ')'
 
     AND      desplazar e ir al estado 24
     OR       desplazar e ir al estado 25
@@ -360,7 +355,7 @@ Estado 23
 
 Estado 24
 
-   14 composite_formula: formula AND • formula
+   16 composite_formula: formula AND • formula
 
     PRED    desplazar e ir al estado 10
     FORALL  desplazar e ir al estado 11
@@ -375,7 +370,7 @@ Estado 24
 
 Estado 25
 
-   15 composite_formula: formula OR • formula
+   17 composite_formula: formula OR • formula
 
     PRED    desplazar e ir al estado 10
     FORALL  desplazar e ir al estado 11
@@ -390,7 +385,7 @@ Estado 25
 
 Estado 26
 
-   16 composite_formula: formula IMPLIES • formula
+   18 composite_formula: formula IMPLIES • formula
 
     PRED    desplazar e ir al estado 10
     FORALL  desplazar e ir al estado 11
@@ -405,7 +400,7 @@ Estado 26
 
 Estado 27
 
-   17 composite_formula: formula IFF • formula
+   19 composite_formula: formula IFF • formula
 
     PRED    desplazar e ir al estado 10
     FORALL  desplazar e ir al estado 11
@@ -420,38 +415,38 @@ Estado 27
 
 Estado 28
 
-    6 sentence: aux_scope formula EOL • aux_end_all_scopes
+    6 sentence: aux_scope formula EOL • aux_end_scope
 
-    $default  reduce usando la regla 8 (aux_end_all_scopes)
+    $default  reduce usando la regla 9 (aux_end_scope)
 
-    aux_end_all_scopes  ir al estado 41
+    aux_end_scope  ir al estado 41
 
 
 Estado 29
 
-   24 term: VAR •
-
-    $default  reduce usando la regla 24 (term)
-
-
-Estado 30
-
-   25 term: CONST •
+   25 term: VAR •
 
     $default  reduce usando la regla 25 (term)
 
 
+Estado 30
+
+   26 term: CONST •
+
+    $default  reduce usando la regla 26 (term)
+
+
 Estado 31
 
-   26 term: FUNC • '(' term_list ')'
+   27 term: FUNC • '(' term_list ')'
 
     '('  desplazar e ir al estado 42
 
 
 Estado 32
 
-   21 atomic_formula: PRED '(' term_list • ')'
-   23 term_list: term_list • ',' term
+   22 atomic_formula: PRED '(' term_list • ')'
+   24 term_list: term_list • ',' term
 
     ')'  desplazar e ir al estado 43
     ','  desplazar e ir al estado 44
@@ -459,98 +454,98 @@ Estado 32
 
 Estado 33
 
-   22 term_list: term •
+   23 term_list: term •
 
-    $default  reduce usando la regla 22 (term_list)
+    $default  reduce usando la regla 23 (term_list)
 
 
 Estado 34
 
-   11 composite_formula: FORALL aux_scope VAR • aux_var formula
+   13 composite_formula: FORALL aux_scope VAR • aux_var formula aux_end_scope
 
-    $default  reduce usando la regla 20 (aux_var)
+    $default  reduce usando la regla 21 (aux_var)
 
     aux_var  ir al estado 45
 
 
 Estado 35
 
-   12 composite_formula: EXISTS aux_scope VAR • aux_var formula
+   14 composite_formula: EXISTS aux_scope VAR • aux_var formula aux_end_scope
 
-    $default  reduce usando la regla 20 (aux_var)
+    $default  reduce usando la regla 21 (aux_var)
 
     aux_var  ir al estado 46
 
 
 Estado 36
 
-   18 composite_formula: '(' formula ')' •
+   20 composite_formula: '(' formula ')' •
 
-    $default  reduce usando la regla 18 (composite_formula)
+    $default  reduce usando la regla 20 (composite_formula)
 
 
 Estado 37
 
-   14 composite_formula: formula • AND formula
-   14                  | formula AND formula •
-   15                  | formula • OR formula
-   16                  | formula • IMPLIES formula
-   17                  | formula • IFF formula
-
-    $default  reduce usando la regla 14 (composite_formula)
-
-
-Estado 38
-
-   14 composite_formula: formula • AND formula
-   15                  | formula • OR formula
-   15                  | formula OR formula •
-   16                  | formula • IMPLIES formula
-   17                  | formula • IFF formula
-
-    AND  desplazar e ir al estado 24
-
-    $default  reduce usando la regla 15 (composite_formula)
-
-
-Estado 39
-
-   14 composite_formula: formula • AND formula
-   15                  | formula • OR formula
-   16                  | formula • IMPLIES formula
-   16                  | formula IMPLIES formula •
-   17                  | formula • IFF formula
-
-    AND  desplazar e ir al estado 24
-    OR   desplazar e ir al estado 25
+   16 composite_formula: formula • AND formula
+   16                  | formula AND formula •
+   17                  | formula • OR formula
+   18                  | formula • IMPLIES formula
+   19                  | formula • IFF formula
 
     $default  reduce usando la regla 16 (composite_formula)
 
 
-Estado 40
+Estado 38
 
-   14 composite_formula: formula • AND formula
-   15                  | formula • OR formula
-   16                  | formula • IMPLIES formula
-   17                  | formula • IFF formula
-   17                  | formula IFF formula •
+   16 composite_formula: formula • AND formula
+   17                  | formula • OR formula
+   17                  | formula OR formula •
+   18                  | formula • IMPLIES formula
+   19                  | formula • IFF formula
 
     AND  desplazar e ir al estado 24
-    OR   desplazar e ir al estado 25
 
     $default  reduce usando la regla 17 (composite_formula)
 
 
+Estado 39
+
+   16 composite_formula: formula • AND formula
+   17                  | formula • OR formula
+   18                  | formula • IMPLIES formula
+   18                  | formula IMPLIES formula •
+   19                  | formula • IFF formula
+
+    AND  desplazar e ir al estado 24
+    OR   desplazar e ir al estado 25
+
+    $default  reduce usando la regla 18 (composite_formula)
+
+
+Estado 40
+
+   16 composite_formula: formula • AND formula
+   17                  | formula • OR formula
+   18                  | formula • IMPLIES formula
+   19                  | formula • IFF formula
+   19                  | formula IFF formula •
+
+    AND  desplazar e ir al estado 24
+    OR   desplazar e ir al estado 25
+
+    $default  reduce usando la regla 19 (composite_formula)
+
+
 Estado 41
 
-    6 sentence: aux_scope formula EOL aux_end_all_scopes •
+    6 sentence: aux_scope formula EOL aux_end_scope •
 
     $default  reduce usando la regla 6 (sentence)
 
 
 Estado 42
 
-   26 term: FUNC '(' • term_list ')'
+   27 term: FUNC '(' • term_list ')'
 
     VAR    desplazar e ir al estado 29
     CONST  desplazar e ir al estado 30
@@ -562,14 +557,14 @@ Estado 42
 
 Estado 43
 
-   21 atomic_formula: PRED '(' term_list ')' •
+   22 atomic_formula: PRED '(' term_list ')' •
 
-    $default  reduce usando la regla 21 (atomic_formula)
+    $default  reduce usando la regla 22 (atomic_formula)
 
 
 Estado 44
 
-   23 term_list: term_list ',' • term
+   24 term_list: term_list ',' • term
 
     VAR    desplazar e ir al estado 29
     CONST  desplazar e ir al estado 30
@@ -580,7 +575,7 @@ Estado 44
 
 Estado 45
 
-   11 composite_formula: FORALL aux_scope VAR aux_var • formula
+   13 composite_formula: FORALL aux_scope VAR aux_var • formula aux_end_scope
 
     PRED    desplazar e ir al estado 10
     FORALL  desplazar e ir al estado 11
@@ -595,7 +590,7 @@ Estado 45
 
 Estado 46
 
-   12 composite_formula: EXISTS aux_scope VAR aux_var • formula
+   14 composite_formula: EXISTS aux_scope VAR aux_var • formula aux_end_scope
 
     PRED    desplazar e ir al estado 10
     FORALL  desplazar e ir al estado 11
@@ -610,8 +605,8 @@ Estado 46
 
 Estado 47
 
-   23 term_list: term_list • ',' term
-   26 term: FUNC '(' term_list • ')'
+   24 term_list: term_list • ',' term
+   27 term: FUNC '(' term_list • ')'
 
     ')'  desplazar e ir al estado 51
     ','  desplazar e ir al estado 44
@@ -619,35 +614,53 @@ Estado 47
 
 Estado 48
 
-   23 term_list: term_list ',' term •
+   24 term_list: term_list ',' term •
 
-    $default  reduce usando la regla 23 (term_list)
+    $default  reduce usando la regla 24 (term_list)
 
 
 Estado 49
 
-   11 composite_formula: FORALL aux_scope VAR aux_var formula •
-   14                  | formula • AND formula
-   15                  | formula • OR formula
-   16                  | formula • IMPLIES formula
-   17                  | formula • IFF formula
+   13 composite_formula: FORALL aux_scope VAR aux_var formula • aux_end_scope
+   16                  | formula • AND formula
+   17                  | formula • OR formula
+   18                  | formula • IMPLIES formula
+   19                  | formula • IFF formula
 
-    $default  reduce usando la regla 11 (composite_formula)
+    $default  reduce usando la regla 9 (aux_end_scope)
+
+    aux_end_scope  ir al estado 52
 
 
 Estado 50
 
-   12 composite_formula: EXISTS aux_scope VAR aux_var formula •
-   14                  | formula • AND formula
-   15                  | formula • OR formula
-   16                  | formula • IMPLIES formula
-   17                  | formula • IFF formula
+   14 composite_formula: EXISTS aux_scope VAR aux_var formula • aux_end_scope
+   16                  | formula • AND formula
+   17                  | formula • OR formula
+   18                  | formula • IMPLIES formula
+   19                  | formula • IFF formula
 
-    $default  reduce usando la regla 12 (composite_formula)
+    $default  reduce usando la regla 9 (aux_end_scope)
+
+    aux_end_scope  ir al estado 53
 
 
 Estado 51
 
-   26 term: FUNC '(' term_list ')' •
+   27 term: FUNC '(' term_list ')' •
 
-    $default  reduce usando la regla 26 (term)
+    $default  reduce usando la regla 27 (term)
+
+
+Estado 52
+
+   13 composite_formula: FORALL aux_scope VAR aux_var formula aux_end_scope •
+
+    $default  reduce usando la regla 13 (composite_formula)
+
+
+Estado 53
+
+   14 composite_formula: EXISTS aux_scope VAR aux_var formula aux_end_scope •
+
+    $default  reduce usando la regla 14 (composite_formula)

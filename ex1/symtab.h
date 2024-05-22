@@ -10,10 +10,15 @@
 /****************************************************************************/
 
 
-/* The type of the value field of symbol table entries                      */
-typedef void* sym_value_type;          /* you will need to replace this    */
-                                        /* with a declaration appropriate   */
-                                        /* for your application.            */
+typedef struct e_info{
+    int type;
+    int arity;
+} entry_info;
+
+/* The type of the value field of symbol table entries                        */
+typedef entry_info sym_value_type;        /* you will need to replace this    */
+                                          /* with a declaration appropriate   */
+                                          /* for your application.            */
 
 /* Uncomment the following define if bindings should point to rather than   */
 /* contain values.                                                          */

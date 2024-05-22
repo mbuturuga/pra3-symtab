@@ -1,25 +1,4 @@
-// Ejemplos de fórmulas léxica i sintácticamente correctes:
-forall x1 forall x2 (P1(x1, x2) -> P2(x2)) ; // Implica 
-forall x1 (P1(x1, x2) <-> (exists x2 P2(x2) and P3(x1, x2)or !P2(f1(x1, x2)))) ; // Doble implica 
-
-// Dos fórmulas en una línea
-forall x1 forall x2 (P1(x1, x2) -> P2(x2)) ;   forall x1 (P1(x1, x2) <-> (exists x2 P2(x2) and P3(x1, x2)or !P2(f1(x1, x2)))) ;
-
-// Fórmula en dos líneas
-forall x1 forall x2 
-(P1(x1, x2) -> P2(x2)) ;
-
-
-// A nivel léxico también son correctas las siguientes fórmulas:
-// (Son incorrectas a nivel sintáctico, pero no a nivel léxico)
-forall x1 forall x2 exists (P1(x1, x2) -> P2(x2)P3(a4) ;
-forall x1 (P1(x1, x2) forall (existsx2P2(x2)!P3(x1, x2) forall !P2(f1(x1, x2))) ;
-forall x1 forall x2 exists (P1(x1, x2) -> P2(x2)P3(a4) ;
-
-// En cambio, a nivel léxico (teniendo en cuenta las definiciones de los componentes) son
-// incorrectas las fórmules siguientes:
-forall m1 forall m2 (P1(x1, x2)-> P2(x2)) ; forall h1 forall h2 (P1(x1, x2)-> P2(x2)) ;
-FORALL x1 FORall m2 (P1(x1, x2)-> P2(x2));
-forall x1 exists x2 (P1(x1, x2) * (exists x2 P2(x2);
-+ P3(x1, x2)or!P2(f1(x1, x2))) ;
-forall x1 : x1 >= 5 forall x2 . (P1(x1, x2)- > P2(x2)) : ;
+P1(a1) or P2(a1, a2);
+P1(a1) or Q2(b1) or R3(c1) -> S4(a2) and T5(b2) or P20(c1) or Q10(a1);
+forall x1 (P1(x1) and Q10(a1));
+(forall x1 exists x2 (P1(x1,x2)<->(forall x2 P2(x2) and P3(x1,x2) or !P2(f1(x1,x2)))));

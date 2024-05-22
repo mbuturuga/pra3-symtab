@@ -23,8 +23,17 @@ void yyerror (char const *);
 extern FILE * yyin;
 extern FILE * yyout;
 
-void* info = NUL;   
-int error = 0;      // boolean to check if there was an error
+// Type definitions
+#define TVAR 1
+#define TPRED 2
+#define TFUNC 3
+
+
+// Variable to store entry information
+entry_info info;
+
+// Boolean to check errors -> we won't print popped scopes after the error
+int error = 0;      
 
 // Function to get a string from a format
 char* get_string(char* format, ...){
@@ -41,7 +50,17 @@ char* get_string(char* format, ...){
 
         return str;
     }
-    
+
+// Function to count the number of arguments in a term list
+int count_args(char* term_list){
+    int count = 1;
+    // Count commas
+    for (int i = 0; term_list[i] != '\0'; i++){
+        if (term_list[i] == ',') count++;
+    }
+    return count;
+}
+
 
 %}
 
@@ -77,10 +96,37 @@ sentence_list: sentence         { $$ = NUL;}
     ;
 
 sentence: EOL                                   {/* empty sentence */ $$ = NUL; }
-    | aux_scope formula EOL aux_end_all_scopes  { fprintf(stdout, GREEN "Valid formula at line %d:\n  %s\n\n" RESET, nlin, $2); $$ = NUL; free($2); }
+    | aux_scope formula EOL aux_end_scope       { printf(GREEN "Valid formula at line %d:\n  %s\n\n" RESET, nlin, $2); $$ = NUL; free($2); }
     | error EOL aux_end_all_scopes              { fprintf(stderr, RED "Invalid formula at line %d\n\n" RESET, nlin); 
                                                   $$ = NUL; 
                                                   yyerrok; }   
+    ;
+
+aux_scope:{ 
+    // Check stack has space to push a new scope
+    if (sym_push_scope() == SYMTAB_STACK_OVERFLOW){
+        fprintf(stderr, "Error: Unable to create new scope at line %d\n", nlin);
+        YYERROR;  
+        }
+    else{
+        // Push new scope and print it
+        int id_scope = sym_get_scope();
+        printf("Pushed scope ID %d\n", id_scope);
+        }
+    }
+    ;
+
+aux_end_scope : %prec FORALL {
+    // Pop current scope
+    int id_scope = sym_get_scope();
+    if(sym_pop_scope() == SYMTAB_OK){
+        printf("Popped scope ID %d\n", id_scope);
+        }
+    else{
+        fprintf(stderr, "Error: Unable to pop scope at line %d\n", nlin);
+        YYERROR;
+        }
+    }
     ;
 
 aux_end_all_scopes: {
@@ -100,81 +146,96 @@ aux_end_all_scopes: {
     // Reset error flag
     error = 0;
     }
-    
-
-aux_end_scope: {
-    // Pop current scope
-    int id_scope = sym_get_scope();
-    if(sym_pop_scope() == SYMTAB_OK){
-        printf("Popped scope ID %d\n", id_scope);
-        }
-    else{
-        fprintf(stderr, "Error: Unable to pop scope at line %d\n", nlin);
-        YYERROR;
-        }
-    }
+    ;
 
 formula: atomic_formula         { $$ = get_string("%s", $1); free($1); }
     | composite_formula         { $$ = get_string("%s", $1); free($1); }
     ;
 
 composite_formula: 
-      FORALL aux_scope VAR aux_var formula %prec FORALL       { $$ = get_string("forall %s %s", $3, $5); free($3); free($5); }
-    | EXISTS aux_scope VAR aux_var formula %prec EXISTS       { $$ = get_string("exists %s %s", $3, $5); free($3); free($5); }
-    | NOT formula                           { $$ = get_string("!%s", $2); free($2); }
-    | formula AND formula                   { $$ = get_string("(%s and %s)", $1, $3); free($1); free($3); }
-    | formula OR formula                    { $$ = get_string("(%s or %s)", $1, $3); free($1); free($3); }
-    | formula IMPLIES formula               { $$ = get_string("(%s -> %s)", $1, $3); free($1); free($3); }
-    | formula IFF formula                   { $$ = get_string("(%s <-> %s)", $1, $3); free($1); free($3); }
-    | '(' formula ')'                       { $$ = get_string("(%s)", $2); free($2);}
+      FORALL aux_scope VAR aux_var formula aux_end_scope %prec FORALL       { $$ = get_string("forall %s %s", $3, $5); free($5); }
+    | EXISTS aux_scope VAR aux_var formula aux_end_scope %prec EXISTS       { $$ = get_string("exists %s %s", $3, $5); free($5); }
+    | NOT formula                   { $$ = get_string("!%s", $2); free($2); }
+    | formula AND formula           { $$ = get_string("(%s and %s)", $1, $3); free($1); free($3); }
+    | formula OR formula            { $$ = get_string("(%s or %s)", $1, $3); free($1); free($3); }
+    | formula IMPLIES formula       { $$ = get_string("(%s -> %s)", $1, $3); free($1); free($3); }
+    | formula IFF formula           { $$ = get_string("(%s <-> %s)", $1, $3); free($1); free($3); }
+    | '(' formula ')'               { $$ = get_string("(%s)", $2); free($2);}
     ;
 
-aux_scope:{ 
-    // Check stack has space to push a new scope
-    if (sym_push_scope() == SYMTAB_STACK_OVERFLOW){
-        fprintf(stderr, "Error: Unable to create new scope at line %d\n", nlin);
-        YYERROR;  
-        }
-    else{
-        // Push new scope and print it
-        int id_scope = sym_get_scope();
-        printf("Pushed scope ID %d\n", id_scope);
-        }
-    }
-
 aux_var: {
-    // Add variable to the current scope
-    char* var = $<name>0;
-    if (sym_add(var, &info) == SYMTAB_DUPLICATE){
-        fprintf(stderr, "SEMANTIC ERROR: Variable %s already declared. Line%d\n", var, nlin);
+    // Add variable to current scope
+    char* var_name = $<name>0;
+
+    // Check if variable is already declared
+    if (sym_lookup(var_name, &info) == SYMTAB_OK){
+        fprintf(stderr, "SEMANTIC ERROR: Variable %s already declared. Line%d\n", var_name, nlin);
         error = 1;
         YYERROR;
-        }
+    }
     else{
-        printf("Added variable %s\n", var);
-        }
-}
+        info.type = TVAR;
+        info.arity = 0;
+        sym_add(var_name, &info);
+        printf("Added variable %s\n", var_name);
+    }
+    }
+    ;
 
+atomic_formula: PRED '(' term_list ')'      { int arity = count_args($3);
 
-atomic_formula: PRED '(' term_list ')'      { $$ = get_string("%s(%s)", $1, $3); free($1); free($3); }
+                                              // If predicate is not declared, add it
+                                              if (sym_lookup($1, &info) == SYMTAB_NOT_FOUND){
+                                                info.type = TPRED;
+                                                info.arity = arity;
+
+                                                sym_add($1, &info);
+                                                printf("Added predicate %s with arity %d\n", $1, info.arity);
+                                              }
+                                              // If declared, check arity
+                                              else if (info.arity != arity){
+                                                fprintf(stderr, "SEMANTIC ERROR: Predicate %s expects %d arguments, but %d were given. Line %d\n", $1, info.arity, arity, nlin);
+                                                error = 1;
+                                                YYERROR;
+                                                }
+
+                                              $$ = get_string("%s(%s)", $1, $3); free($3);
+                                            }
     ;
 
 term_list: term                             { $$ = get_string("%s", $1); free($1); }
     | term_list ',' term                    { $$ = get_string("%s,%s", $1, $3); free($1); free($3); }
     ;
 
-term: VAR                                   { // Check if variable is declared (quantified)
-                                            if (sym_lookup($1, &info) == SYMTAB_NOT_FOUND){
+term: VAR                                   { 
+                                              // Check if variable is not declared (quantified)
+                                              if (sym_lookup($1, &info) == SYMTAB_NOT_FOUND){
                                                 fprintf(stderr, "SEMANTIC ERROR: Variable %s not quantified. Line %d\n", $1, nlin);
                                                 error = 1;
                                                 YYERROR;
-                                                }
-                                            else{
+                                              }
                                                 $$ = get_string("%s", $1); free($1);
-                                                }
                                             }                           
     | CONST                                 { $$ = get_string("%s", $1); free($1); }
-    | FUNC '(' term_list ')'                { $$ = get_string("%s(%s)", $1, $3); free($1); free($3); }
+    | FUNC '(' term_list ')'                { int arity = count_args($3);
+
+                                              // If function is not declared, add it
+                                              if (sym_lookup($1, &info) == SYMTAB_NOT_FOUND){
+                                                info.type = TFUNC;
+                                                info.arity = arity;
+
+                                                sym_add($1, &info);
+                                                printf("Added function %s with arity %d\n", $1, info.arity);
+                                              }
+                                              // If declared, check arity
+                                              else if (info.arity != arity){
+                                                fprintf(stderr, "SEMANTIC ERROR: Function %s expects %d arguments, but %d were given. Line %d\n", $1, info.arity, arity, nlin);
+                                                error = 1;
+                                                YYERROR;
+                                                }
+
+                                              $$ = get_string("%s(%s)", $1, $3); free($3);
+                                            }
     ;
 
 %%

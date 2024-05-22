@@ -93,8 +93,17 @@ void yyerror (char const *);
 extern FILE * yyin;
 extern FILE * yyout;
 
-void* info = NUL;   
-int error = 0;      // boolean to check if there was an error
+// Type definitions
+#define TVAR 1
+#define TPRED 2
+#define TFUNC 3
+
+
+// Variable to store entry information
+entry_info info;
+
+// Boolean to check errors -> we won't print popped scopes after the error
+int error = 0;      
 
 // Function to get a string from a format
 char* get_string(char* format, ...){
@@ -111,10 +120,20 @@ char* get_string(char* format, ...){
 
         return str;
     }
-    
+
+// Function to count the number of arguments in a term list
+int count_args(char* term_list){
+    int count = 1;
+    // Count commas
+    for (int i = 0; term_list[i] != '\0'; i++){
+        if (term_list[i] == ',') count++;
+    }
+    return count;
+}
 
 
-#line 118 "ex1.tab.c"
+
+#line 137 "ex1.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -164,14 +183,15 @@ enum yysymbol_kind_t
   YYSYMBOL_program = 19,                   /* program  */
   YYSYMBOL_sentence_list = 20,             /* sentence_list  */
   YYSYMBOL_sentence = 21,                  /* sentence  */
-  YYSYMBOL_aux_end_all_scopes = 22,        /* aux_end_all_scopes  */
-  YYSYMBOL_formula = 23,                   /* formula  */
-  YYSYMBOL_composite_formula = 24,         /* composite_formula  */
-  YYSYMBOL_aux_scope = 25,                 /* aux_scope  */
-  YYSYMBOL_aux_var = 26,                   /* aux_var  */
-  YYSYMBOL_atomic_formula = 27,            /* atomic_formula  */
-  YYSYMBOL_term_list = 28,                 /* term_list  */
-  YYSYMBOL_term = 29                       /* term  */
+  YYSYMBOL_aux_scope = 22,                 /* aux_scope  */
+  YYSYMBOL_aux_end_scope = 23,             /* aux_end_scope  */
+  YYSYMBOL_aux_end_all_scopes = 24,        /* aux_end_all_scopes  */
+  YYSYMBOL_formula = 25,                   /* formula  */
+  YYSYMBOL_composite_formula = 26,         /* composite_formula  */
+  YYSYMBOL_aux_var = 27,                   /* aux_var  */
+  YYSYMBOL_atomic_formula = 28,            /* atomic_formula  */
+  YYSYMBOL_term_list = 29,                 /* term_list  */
+  YYSYMBOL_term = 30                       /* term  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -504,11 +524,11 @@ union yyalloc
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  18
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  12
+#define YYNNTS  13
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  27
+#define YYNRULES  28
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  52
+#define YYNSTATES  54
 
 /* YYMAXUTOK -- Last valid token kind.  */
 #define YYMAXUTOK   269
@@ -558,9 +578,9 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    71,    71,    72,    75,    76,    79,    80,    81,    86,
-     117,   118,   122,   123,   124,   125,   126,   127,   128,   129,
-     132,   145,   159,   162,   163,   166,   176,   177
+       0,    90,    90,    91,    94,    95,    98,    99,   100,   105,
+     119,   132,   151,   152,   156,   157,   158,   159,   160,   161,
+     162,   163,   166,   185,   206,   207,   210,   219,   220
 };
 #endif
 
@@ -579,8 +599,8 @@ static const char *const yytname[] =
   "\"end of file\"", "error", "\"invalid token\"", "VAR", "CONST", "PRED",
   "FUNC", "FORALL", "EXISTS", "AND", "OR", "NOT", "IMPLIES", "IFF", "EOL",
   "'('", "')'", "','", "$accept", "program", "sentence_list", "sentence",
-  "aux_end_all_scopes", "formula", "composite_formula", "aux_scope",
-  "aux_var", "atomic_formula", "term_list", "term", YY_NULLPTR
+  "aux_scope", "aux_end_scope", "aux_end_all_scopes", "formula",
+  "composite_formula", "aux_var", "atomic_formula", "term_list", "term", YY_NULLPTR
 };
 
 static const char *
@@ -595,7 +615,7 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
 
-#define YYTABLE_NINF (-21)
+#define YYTABLE_NINF (-10)
 
 #define yytable_value_is_error(Yyn) \
   0
@@ -609,7 +629,7 @@ static const yytype_int8 yypact[] =
       28,    35,   -14,    -7,    39,    39,    39,    39,   -14,   -14,
      -14,    36,     1,   -14,   -14,   -14,   -14,   -14,    31,    18,
       18,   -14,     4,   -14,     4,    39,    39,     8,   -14,   -14,
-     -14,   -14
+     -14,   -14,   -14,   -14
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -617,26 +637,26 @@ static const yytype_int8 yypact[] =
    means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       0,     0,     6,     0,     0,     4,     0,     9,     1,     5,
-       0,    20,    20,     0,     0,     0,    11,    10,     8,     0,
-       0,     0,    14,     0,     0,     0,     0,     0,     9,    25,
-      26,     0,     0,    23,    21,    21,    19,    15,    16,    17,
-      18,     7,     0,    22,     0,     0,     0,     0,    24,    12,
-      13,    27
+       0,     0,     6,     0,     0,     4,     0,    11,     1,     5,
+       0,     9,     9,     0,     0,     0,    13,    12,     8,     0,
+       0,     0,    16,     0,     0,     0,     0,     0,    10,    26,
+      27,     0,     0,    24,    22,    22,    21,    17,    18,    19,
+      20,     7,     0,    23,     0,     0,     0,     0,    25,    10,
+      10,    28,    14,    15
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -14,   -14,   -14,    54,    32,   -13,   -14,    25,    24,   -14,
-      20,    -1
+     -14,   -14,   -14,    56,    25,     9,   -14,   -13,   -14,    26,
+     -14,    20,    -1
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-       0,     3,     4,     5,    18,    15,    16,     6,    45,    17,
-      32,    33
+       0,     3,     4,     5,     6,    41,    18,    15,    16,    45,
+      17,    32,    33
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -646,11 +666,11 @@ static const yytype_int8 yytable[] =
 {
       22,    23,    24,    25,     7,    26,    27,    29,    30,    36,
       31,    37,    38,    39,    40,    -3,     1,    43,    44,     8,
-     -20,    19,   -20,   -20,    51,    44,   -20,    24,    25,     2,
-     -20,    34,    49,    50,    -2,     1,    20,    21,    35,   -20,
-      24,   -20,   -20,    48,    10,   -20,    11,    12,     2,   -20,
-      13,    42,    24,    25,    14,    26,    27,    28,     9,    46,
-      41,     0,    47
+      -9,    19,    -9,    -9,    51,    44,    -9,    24,    25,     2,
+      -9,    34,    49,    50,    -2,     1,    20,    21,    35,    -9,
+      24,    -9,    -9,    48,    10,    -9,    11,    12,     2,    -9,
+      13,    42,    24,    25,    14,    26,    27,    28,    52,    53,
+       9,    46,    47
 };
 
 static const yytype_int8 yycheck[] =
@@ -660,36 +680,36 @@ static const yytype_int8 yycheck[] =
        5,    15,     7,     8,    16,    17,    11,     9,    10,    14,
       15,     3,    45,    46,     0,     1,    11,    12,     3,     5,
        9,     7,     8,    44,     5,    11,     7,     8,    14,    15,
-      11,    15,     9,    10,    15,    12,    13,    14,     4,    35,
-      28,    -1,    42
+      11,    15,     9,    10,    15,    12,    13,    14,    49,    50,
+       4,    35,    42
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
    state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     1,    14,    19,    20,    21,    25,    14,     0,    21,
-       5,     7,     8,    11,    15,    23,    24,    27,    22,    15,
-      25,    25,    23,    23,     9,    10,    12,    13,    14,     3,
-       4,     6,    28,    29,     3,     3,    16,    23,    23,    23,
-      23,    22,    15,    16,    17,    26,    26,    28,    29,    23,
-      23,    16
+       0,     1,    14,    19,    20,    21,    22,    14,     0,    21,
+       5,     7,     8,    11,    15,    25,    26,    28,    24,    15,
+      22,    22,    25,    25,     9,    10,    12,    13,    14,     3,
+       4,     6,    29,    30,     3,     3,    16,    25,    25,    25,
+      25,    23,    15,    16,    17,    27,    27,    29,    30,    25,
+      25,    16,    23,    23
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr1[] =
 {
        0,    18,    19,    19,    20,    20,    21,    21,    21,    22,
-      23,    23,    24,    24,    24,    24,    24,    24,    24,    24,
-      25,    26,    27,    28,    28,    29,    29,    29
+      23,    24,    25,    25,    26,    26,    26,    26,    26,    26,
+      26,    26,    27,    28,    29,    29,    30,    30,    30
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr2[] =
 {
        0,     2,     1,     0,     1,     2,     1,     4,     3,     0,
-       1,     1,     5,     5,     2,     3,     3,     3,     3,     3,
-       0,     0,     4,     1,     3,     1,     1,     4
+       0,     0,     1,     1,     6,     6,     2,     3,     3,     3,
+       3,     3,     0,     4,     1,     3,     1,     1,     4
 };
 
 
@@ -1153,51 +1173,84 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* program: sentence_list  */
-#line 71 "ex1.y"
+#line 90 "ex1.y"
                                 { (yyval.notype) = NUL;}
-#line 1159 "ex1.tab.c"
+#line 1179 "ex1.tab.c"
     break;
 
   case 3: /* program: %empty  */
-#line 72 "ex1.y"
+#line 91 "ex1.y"
                                 { (yyval.notype) = NUL;}
-#line 1165 "ex1.tab.c"
+#line 1185 "ex1.tab.c"
     break;
 
   case 4: /* sentence_list: sentence  */
-#line 75 "ex1.y"
+#line 94 "ex1.y"
                                 { (yyval.notype) = NUL;}
-#line 1171 "ex1.tab.c"
+#line 1191 "ex1.tab.c"
     break;
 
   case 5: /* sentence_list: sentence_list sentence  */
-#line 76 "ex1.y"
+#line 95 "ex1.y"
                                 { (yyval.notype) = NUL;}
-#line 1177 "ex1.tab.c"
-    break;
-
-  case 6: /* sentence: EOL  */
-#line 79 "ex1.y"
-                                                {/* empty sentence */ (yyval.notype) = NUL; }
-#line 1183 "ex1.tab.c"
-    break;
-
-  case 7: /* sentence: aux_scope formula EOL aux_end_all_scopes  */
-#line 80 "ex1.y"
-                                                { fprintf(stdout, GREEN "Valid formula at line %d:\n  %s\n\n" RESET, nlin, (yyvsp[-2].string)); (yyval.notype) = NUL; free((yyvsp[-2].string)); }
-#line 1189 "ex1.tab.c"
-    break;
-
-  case 8: /* sentence: error EOL aux_end_all_scopes  */
-#line 81 "ex1.y"
-                                                { fprintf(stderr, RED "Invalid formula at line %d\n\n" RESET, nlin); 
-                                                  (yyval.notype) = NUL; 
-                                                  yyerrok; }
 #line 1197 "ex1.tab.c"
     break;
 
-  case 9: /* aux_end_all_scopes: %empty  */
-#line 86 "ex1.y"
+  case 6: /* sentence: EOL  */
+#line 98 "ex1.y"
+                                                {/* empty sentence */ (yyval.notype) = NUL; }
+#line 1203 "ex1.tab.c"
+    break;
+
+  case 7: /* sentence: aux_scope formula EOL aux_end_scope  */
+#line 99 "ex1.y"
+                                                { printf(GREEN "Valid formula at line %d:\n  %s\n\n" RESET, nlin, (yyvsp[-2].string)); (yyval.notype) = NUL; free((yyvsp[-2].string)); }
+#line 1209 "ex1.tab.c"
+    break;
+
+  case 8: /* sentence: error EOL aux_end_all_scopes  */
+#line 100 "ex1.y"
+                                                { fprintf(stderr, RED "Invalid formula at line %d\n\n" RESET, nlin); 
+                                                  (yyval.notype) = NUL; 
+                                                  yyerrok; }
+#line 1217 "ex1.tab.c"
+    break;
+
+  case 9: /* aux_scope: %empty  */
+#line 105 "ex1.y"
+          { 
+    // Check stack has space to push a new scope
+    if (sym_push_scope() == SYMTAB_STACK_OVERFLOW){
+        fprintf(stderr, "Error: Unable to create new scope at line %d\n", nlin);
+        YYERROR;  
+        }
+    else{
+        // Push new scope and print it
+        int id_scope = sym_get_scope();
+        printf("Pushed scope ID %d\n", id_scope);
+        }
+    }
+#line 1234 "ex1.tab.c"
+    break;
+
+  case 10: /* aux_end_scope: %empty  */
+#line 119 "ex1.y"
+                             {
+    // Pop current scope
+    int id_scope = sym_get_scope();
+    if(sym_pop_scope() == SYMTAB_OK){
+        printf("Popped scope ID %d\n", id_scope);
+        }
+    else{
+        fprintf(stderr, "Error: Unable to pop scope at line %d\n", nlin);
+        YYERROR;
+        }
+    }
+#line 1250 "ex1.tab.c"
+    break;
+
+  case 11: /* aux_end_all_scopes: %empty  */
+#line 132 "ex1.y"
                     {
     // Pop all remaining scopes
     int id_scope = sym_get_scope();
@@ -1215,150 +1268,173 @@ yyreduce:
     // Reset error flag
     error = 0;
     }
-#line 1219 "ex1.tab.c"
+#line 1272 "ex1.tab.c"
     break;
 
-  case 10: /* formula: atomic_formula  */
-#line 117 "ex1.y"
+  case 12: /* formula: atomic_formula  */
+#line 151 "ex1.y"
                                 { (yyval.string) = get_string("%s", (yyvsp[0].string)); free((yyvsp[0].string)); }
-#line 1225 "ex1.tab.c"
+#line 1278 "ex1.tab.c"
     break;
 
-  case 11: /* formula: composite_formula  */
-#line 118 "ex1.y"
+  case 13: /* formula: composite_formula  */
+#line 152 "ex1.y"
                                 { (yyval.string) = get_string("%s", (yyvsp[0].string)); free((yyvsp[0].string)); }
-#line 1231 "ex1.tab.c"
+#line 1284 "ex1.tab.c"
     break;
 
-  case 12: /* composite_formula: FORALL aux_scope VAR aux_var formula  */
-#line 122 "ex1.y"
-                                                              { (yyval.string) = get_string("forall %s %s", (yyvsp[-2].name), (yyvsp[0].string)); free((yyvsp[-2].name)); free((yyvsp[0].string)); }
-#line 1237 "ex1.tab.c"
+  case 14: /* composite_formula: FORALL aux_scope VAR aux_var formula aux_end_scope  */
+#line 156 "ex1.y"
+                                                                            { (yyval.string) = get_string("forall %s %s", (yyvsp[-3].name), (yyvsp[-1].string)); free((yyvsp[-1].string)); }
+#line 1290 "ex1.tab.c"
     break;
 
-  case 13: /* composite_formula: EXISTS aux_scope VAR aux_var formula  */
-#line 123 "ex1.y"
-                                                              { (yyval.string) = get_string("exists %s %s", (yyvsp[-2].name), (yyvsp[0].string)); free((yyvsp[-2].name)); free((yyvsp[0].string)); }
-#line 1243 "ex1.tab.c"
-    break;
-
-  case 14: /* composite_formula: NOT formula  */
-#line 124 "ex1.y"
-                                            { (yyval.string) = get_string("!%s", (yyvsp[0].string)); free((yyvsp[0].string)); }
-#line 1249 "ex1.tab.c"
-    break;
-
-  case 15: /* composite_formula: formula AND formula  */
-#line 125 "ex1.y"
-                                            { (yyval.string) = get_string("(%s and %s)", (yyvsp[-2].string), (yyvsp[0].string)); free((yyvsp[-2].string)); free((yyvsp[0].string)); }
-#line 1255 "ex1.tab.c"
-    break;
-
-  case 16: /* composite_formula: formula OR formula  */
-#line 126 "ex1.y"
-                                            { (yyval.string) = get_string("(%s or %s)", (yyvsp[-2].string), (yyvsp[0].string)); free((yyvsp[-2].string)); free((yyvsp[0].string)); }
-#line 1261 "ex1.tab.c"
-    break;
-
-  case 17: /* composite_formula: formula IMPLIES formula  */
-#line 127 "ex1.y"
-                                            { (yyval.string) = get_string("(%s -> %s)", (yyvsp[-2].string), (yyvsp[0].string)); free((yyvsp[-2].string)); free((yyvsp[0].string)); }
-#line 1267 "ex1.tab.c"
-    break;
-
-  case 18: /* composite_formula: formula IFF formula  */
-#line 128 "ex1.y"
-                                            { (yyval.string) = get_string("(%s <-> %s)", (yyvsp[-2].string), (yyvsp[0].string)); free((yyvsp[-2].string)); free((yyvsp[0].string)); }
-#line 1273 "ex1.tab.c"
-    break;
-
-  case 19: /* composite_formula: '(' formula ')'  */
-#line 129 "ex1.y"
-                                            { (yyval.string) = get_string("(%s)", (yyvsp[-1].string)); free((yyvsp[-1].string));}
-#line 1279 "ex1.tab.c"
-    break;
-
-  case 20: /* aux_scope: %empty  */
-#line 132 "ex1.y"
-          { 
-    // Check stack has space to push a new scope
-    if (sym_push_scope() == SYMTAB_STACK_OVERFLOW){
-        fprintf(stderr, "Error: Unable to create new scope at line %d\n", nlin);
-        YYERROR;  
-        }
-    else{
-        // Push new scope and print it
-        int id_scope = sym_get_scope();
-        printf("Pushed scope ID %d\n", id_scope);
-        }
-    }
+  case 15: /* composite_formula: EXISTS aux_scope VAR aux_var formula aux_end_scope  */
+#line 157 "ex1.y"
+                                                                            { (yyval.string) = get_string("exists %s %s", (yyvsp[-3].name), (yyvsp[-1].string)); free((yyvsp[-1].string)); }
 #line 1296 "ex1.tab.c"
     break;
 
-  case 21: /* aux_var: %empty  */
-#line 145 "ex1.y"
+  case 16: /* composite_formula: NOT formula  */
+#line 158 "ex1.y"
+                                    { (yyval.string) = get_string("!%s", (yyvsp[0].string)); free((yyvsp[0].string)); }
+#line 1302 "ex1.tab.c"
+    break;
+
+  case 17: /* composite_formula: formula AND formula  */
+#line 159 "ex1.y"
+                                    { (yyval.string) = get_string("(%s and %s)", (yyvsp[-2].string), (yyvsp[0].string)); free((yyvsp[-2].string)); free((yyvsp[0].string)); }
+#line 1308 "ex1.tab.c"
+    break;
+
+  case 18: /* composite_formula: formula OR formula  */
+#line 160 "ex1.y"
+                                    { (yyval.string) = get_string("(%s or %s)", (yyvsp[-2].string), (yyvsp[0].string)); free((yyvsp[-2].string)); free((yyvsp[0].string)); }
+#line 1314 "ex1.tab.c"
+    break;
+
+  case 19: /* composite_formula: formula IMPLIES formula  */
+#line 161 "ex1.y"
+                                    { (yyval.string) = get_string("(%s -> %s)", (yyvsp[-2].string), (yyvsp[0].string)); free((yyvsp[-2].string)); free((yyvsp[0].string)); }
+#line 1320 "ex1.tab.c"
+    break;
+
+  case 20: /* composite_formula: formula IFF formula  */
+#line 162 "ex1.y"
+                                    { (yyval.string) = get_string("(%s <-> %s)", (yyvsp[-2].string), (yyvsp[0].string)); free((yyvsp[-2].string)); free((yyvsp[0].string)); }
+#line 1326 "ex1.tab.c"
+    break;
+
+  case 21: /* composite_formula: '(' formula ')'  */
+#line 163 "ex1.y"
+                                    { (yyval.string) = get_string("(%s)", (yyvsp[-1].string)); free((yyvsp[-1].string));}
+#line 1332 "ex1.tab.c"
+    break;
+
+  case 22: /* aux_var: %empty  */
+#line 166 "ex1.y"
          {
-    // Add variable to the current scope
-    char* var = (yyvsp[0].name);
-    if (sym_add(var, &info) == SYMTAB_DUPLICATE){
-        fprintf(stderr, "SEMANTIC ERROR: Variable %s already declared. Line%d\n", var, nlin);
+    // Add variable to current scope
+    char* var_name = (yyvsp[0].name);
+
+    // Check if variable is already declared
+    if (sym_lookup(var_name, &info) == SYMTAB_OK){
+        fprintf(stderr, "SEMANTIC ERROR: Variable %s already declared. Line%d\n", var_name, nlin);
         error = 1;
         YYERROR;
-        }
+    }
     else{
-        printf("Added variable %s\n", var);
-        }
-}
-#line 1313 "ex1.tab.c"
+        info.type = TVAR;
+        info.arity = 0;
+        sym_add(var_name, &info);
+        printf("Added variable %s\n", var_name);
+    }
+    }
+#line 1354 "ex1.tab.c"
     break;
 
-  case 22: /* atomic_formula: PRED '(' term_list ')'  */
-#line 159 "ex1.y"
-                                            { (yyval.string) = get_string("%s(%s)", (yyvsp[-3].name), (yyvsp[-1].string)); free((yyvsp[-3].name)); free((yyvsp[-1].string)); }
-#line 1319 "ex1.tab.c"
-    break;
+  case 23: /* atomic_formula: PRED '(' term_list ')'  */
+#line 185 "ex1.y"
+                                            { int arity = count_args((yyvsp[-1].string));
 
-  case 23: /* term_list: term  */
-#line 162 "ex1.y"
-                                            { (yyval.string) = get_string("%s", (yyvsp[0].string)); free((yyvsp[0].string)); }
-#line 1325 "ex1.tab.c"
-    break;
+                                              // If predicate is not declared, add it
+                                              if (sym_lookup((yyvsp[-3].name), &info) == SYMTAB_NOT_FOUND){
+                                                info.type = TPRED;
+                                                info.arity = arity;
 
-  case 24: /* term_list: term_list ',' term  */
-#line 163 "ex1.y"
-                                            { (yyval.string) = get_string("%s,%s", (yyvsp[-2].string), (yyvsp[0].string)); free((yyvsp[-2].string)); free((yyvsp[0].string)); }
-#line 1331 "ex1.tab.c"
-    break;
-
-  case 25: /* term: VAR  */
-#line 166 "ex1.y"
-                                            { // Check if variable is declared (quantified)
-                                            if (sym_lookup((yyvsp[0].name), &info) == SYMTAB_NOT_FOUND){
-                                                fprintf(stderr, "SEMANTIC ERROR: Variable %s not quantified. Line %d\n", (yyvsp[0].name), nlin);
+                                                sym_add((yyvsp[-3].name), &info);
+                                                printf("Added predicate %s with arity %d\n", (yyvsp[-3].name), info.arity);
+                                              }
+                                              // If declared, check arity
+                                              else if (info.arity != arity){
+                                                fprintf(stderr, "SEMANTIC ERROR: Predicate %s expects %d arguments, but %d were given. Line %d\n", (yyvsp[-3].name), info.arity, arity, nlin);
                                                 error = 1;
                                                 YYERROR;
                                                 }
-                                            else{
-                                                (yyval.string) = get_string("%s", (yyvsp[0].name)); free((yyvsp[0].name));
-                                                }
+
+                                              (yyval.string) = get_string("%s(%s)", (yyvsp[-3].name), (yyvsp[-1].string)); free((yyvsp[-1].string));
                                             }
-#line 1346 "ex1.tab.c"
+#line 1378 "ex1.tab.c"
     break;
 
-  case 26: /* term: CONST  */
-#line 176 "ex1.y"
+  case 24: /* term_list: term  */
+#line 206 "ex1.y"
+                                            { (yyval.string) = get_string("%s", (yyvsp[0].string)); free((yyvsp[0].string)); }
+#line 1384 "ex1.tab.c"
+    break;
+
+  case 25: /* term_list: term_list ',' term  */
+#line 207 "ex1.y"
+                                            { (yyval.string) = get_string("%s,%s", (yyvsp[-2].string), (yyvsp[0].string)); free((yyvsp[-2].string)); free((yyvsp[0].string)); }
+#line 1390 "ex1.tab.c"
+    break;
+
+  case 26: /* term: VAR  */
+#line 210 "ex1.y"
+                                            { 
+                                              // Check if variable is not declared (quantified)
+                                              if (sym_lookup((yyvsp[0].name), &info) == SYMTAB_NOT_FOUND){
+                                                fprintf(stderr, "SEMANTIC ERROR: Variable %s not quantified. Line %d\n", (yyvsp[0].name), nlin);
+                                                error = 1;
+                                                YYERROR;
+                                              }
+                                                (yyval.string) = get_string("%s", (yyvsp[0].name)); free((yyvsp[0].name));
+                                            }
+#line 1404 "ex1.tab.c"
+    break;
+
+  case 27: /* term: CONST  */
+#line 219 "ex1.y"
                                             { (yyval.string) = get_string("%s", (yyvsp[0].name)); free((yyvsp[0].name)); }
-#line 1352 "ex1.tab.c"
+#line 1410 "ex1.tab.c"
     break;
 
-  case 27: /* term: FUNC '(' term_list ')'  */
-#line 177 "ex1.y"
-                                            { (yyval.string) = get_string("%s(%s)", (yyvsp[-3].name), (yyvsp[-1].string)); free((yyvsp[-3].name)); free((yyvsp[-1].string)); }
-#line 1358 "ex1.tab.c"
+  case 28: /* term: FUNC '(' term_list ')'  */
+#line 220 "ex1.y"
+                                            { int arity = count_args((yyvsp[-1].string));
+
+                                              // If function is not declared, add it
+                                              if (sym_lookup((yyvsp[-3].name), &info) == SYMTAB_NOT_FOUND){
+                                                info.type = TFUNC;
+                                                info.arity = arity;
+
+                                                sym_add((yyvsp[-3].name), &info);
+                                                printf("Added function %s with arity %d\n", (yyvsp[-3].name), info.arity);
+                                              }
+                                              // If declared, check arity
+                                              else if (info.arity != arity){
+                                                fprintf(stderr, "SEMANTIC ERROR: Function %s expects %d arguments, but %d were given. Line %d\n", (yyvsp[-3].name), info.arity, arity, nlin);
+                                                error = 1;
+                                                YYERROR;
+                                                }
+
+                                              (yyval.string) = get_string("%s(%s)", (yyvsp[-3].name), (yyvsp[-1].string)); free((yyvsp[-1].string));
+                                            }
+#line 1434 "ex1.tab.c"
     break;
 
 
-#line 1362 "ex1.tab.c"
+#line 1438 "ex1.tab.c"
 
       default: break;
     }
@@ -1551,7 +1627,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 180 "ex1.y"
+#line 241 "ex1.y"
 
 
 // Called by yyparse on error

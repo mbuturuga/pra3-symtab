@@ -12,10 +12,10 @@
 %option noyywrap
 
 
-VARIABLES    [x-z][1-9]+
-CONSTANTS    [a-c][1-9]+
-PREDICATES   [P-T][1-9]+
-FUNCTIONS    [f-g][1-9]+
+VARIABLES    [x-z][1-9][0-9]*
+CONSTANTS    [a-c][1-9][0-9]*
+PREDICATES   [P-T][1-9][0-9]*
+FUNCTIONS    [f-g][1-9][0-9]*
 
 SEPARATORS   "("|")"|","
 
